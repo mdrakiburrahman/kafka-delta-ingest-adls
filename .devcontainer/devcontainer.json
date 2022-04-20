@@ -39,6 +39,7 @@
 		"github.copilot",
 		// VSCode stuff
 		"esbenp.prettier-vscode",
+		"fabianlauer.vs-code-xml-format"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

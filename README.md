@@ -2,11 +2,25 @@
 
 ## Build and run locally
 
+Run locally:
 ```bash
-
-
+cd /workspaces/kafka-delta-ingest-adls/src/main/java/com/mycompany/app
+java App.java
 ```
 
+Run via Maven with `java -cp`:
+```bash
+/workspaces/kafka-delta-ingest-adls
+mvn clean package
+java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App
+```
+
+Run as standalone jar:
+```bash
+/workspaces/kafka-delta-ingest-adls
+mvn clean package
+java -jar target/my-app-1.0-SNAPSHOT.jar
+```
 
 ## Debug locally
 
