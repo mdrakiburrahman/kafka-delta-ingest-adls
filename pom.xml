@@ -35,6 +35,39 @@
 				test
 			</scope>
 		</dependency>
+		<dependency>
+			<groupId>
+				io.delta
+			</groupId>
+			<artifactId>
+				delta-standalone_2.12
+			</artifactId>
+			<version>
+				0.4.0
+			</version>
+		</dependency>
+		<dependency>
+			<groupId>
+				org.apache.hadoop
+			</groupId>
+			<artifactId>
+				hadoop-client
+			</artifactId>
+			<version>
+				3.1.0
+			</version>
+		</dependency>
+		<dependency>
+			<groupId>
+				org.apache.parquet
+			</groupId>
+			<artifactId>
+				parquet-hadoop
+			</artifactId>
+			<version>
+				1.10.1
+			</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<jdk.version>
@@ -65,7 +98,8 @@
 						<archive>
 							<manifest>
 								<mainClass>
-									com.mycompany.app.App <!-- Entry point -->
+									com.mycompany.app.App
+									<!-- Entry point -->
 								</mainClass>
 							</manifest>
 						</archive>
