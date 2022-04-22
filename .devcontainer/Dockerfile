@@ -16,9 +16,17 @@ RUN if [ "${INSTALL_MAVEN}" = "true" ]; then su vscode -c "umask 0002 && . /usr/
 ARG NODE_VERSION="none"
 RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
 
-# [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+# = = = = = = = = = = = = = = = = = = = = = = = =
+# Install Spark locally for development purposes
+# = = = = = = = = = = = = = = = = = = = = = = = =
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get -y install mlocate && \
+    apt-get install tree -y
 
-# [Optional] Uncomment this line to install global node packages.
-# RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
+# Install Apache Spark
+RUN wget https://dlcdn.apache.org/spark/spark-3.1.2/spark-3.1.2-bin-hadoop3.2.tgz && \
+    tar -xvf spark-3.1.2-bin-hadoop3.2.tgz && \
+    mkdir /opt/spark && \
+    mv spark-3.1.2-bin-hadoop3.2/* /opt/spark && \
+    rm spark-3.1.2-bin-hadoop3.2.tgz && \
+    rm -rf spark-3.1.2-bin-hadoop3.2
