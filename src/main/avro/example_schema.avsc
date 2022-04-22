@@ -1,0 +1,9 @@
+{
+    "type": "record",
+    "namespace": "com.mycompany.app",
+    "name": "UserRank",
+    "fields": [
+      { "name": "userId", "type": "int" },
+      { "name": "rank", "type": "int" }
+    ]
+}
