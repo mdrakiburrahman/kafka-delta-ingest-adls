@@ -10,6 +10,7 @@ import io.delta.standalone.data.RowRecord;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 
+// Java file stuff
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,12 +20,10 @@ import java.text.MessageFormat;
 import org.apache.avro.Schema;
 
 // Generic Parquet dependencies
-import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import org.apache.parquet.hadoop.ParquetWriter;
 
 // Avro->Parquet dependencies
-import org.apache.parquet.avro.AvroSchemaConverter;
 import org.apache.parquet.avro.AvroParquetWriter;
 
 public class App {
@@ -55,6 +54,59 @@ public class App {
         System.out.println("\n");
     }
 
+    // Generate the name of a parquet file
+    // For example, if directory is empty: 
+    //      part-00000-07bdefde-6514-4aee-a0f7-e124fea7955a-c000.snappy.parquet
+    // Whereas if a file already exists that has part-00000-...snappy.parquet, then the next file will be:
+    //      part-00001-5dc5f78d-38d1-449e-b72a-8c7d6cee1155-c000.snappy.parquet
+    public static String GenerateParquetFileName(File pathAsFile)
+    {
+        String FileName = "";
+        
+        // Generate random Guid
+        String Guid = java.util.UUID.randomUUID().toString();
+
+        if (pathAsFile.isDirectory())
+        {
+            File[] files = pathAsFile.listFiles();
+            if (files.length == 0) // If no files exist, then use the default name
+            {
+                FileName = "part-00000-" + Guid + "-c000.snappy.parquet";
+            }
+            else // Otherwise, find the next available file name
+            {
+                // Get list of all files in directory
+                String[] fileNames = new String[files.length];
+                for (int i = 0; i < files.length; i++)
+                {
+                    // if name does not match "_delta_log" or end with ".crc", append to list
+                    if (!files[i].getName().equals("_delta_log") && !files[i].getName().endsWith(".crc"))
+                    {
+                        fileNames[i] = files[i].getName();
+                    }
+                }
+                // Remove all null entries in fileNames
+                fileNames = java.util.Arrays.stream(fileNames).filter(s -> s != null).toArray(String[]::new);
+
+                // Find file that has the highest integer in part-XXXXX
+                int max = Integer.MIN_VALUE;
+                for (int i = 0; i < fileNames.length; i++)
+                {
+                    String[] fileNameParts = fileNames[i].split("-");
+                    int fileNamePart = Integer.parseInt(fileNameParts[1]);
+                    if (fileNamePart > max)
+                    {
+                        max = fileNamePart;
+                    }
+                }
+                // Generate new file name
+                FileName = "part-" + String.format("%05d", ++max) + "-" + Guid + "-c000.snappy.parquet";
+            }
+        }
+
+        return FileName;
+    }
+
     public static void main(String[] args) {
         // = = = = = = = = = = = =
         // Read Demo
@@ -72,31 +124,27 @@ public class App {
         // = = = = = = = = = = = =
         // Write Demo
         // = = = = = = = = = = = =
-        String Writepath = "/tmp/delta_standalone_write";
-        System.out.println(MessageFormat.format("Creating Parquet To: {0}", Writepath));
+        String WritePath = "/tmp/delta_standalone_write";
+        System.out.println(MessageFormat.format("Creating Parquet To: {0}", WritePath));
 
-        File pathAsFile = new File(Writepath);
+        File pathAsFile = new File(WritePath);
 
         // Create directory if it doesn't exist
-        if (!Files.exists(Paths.get(Writepath))) {
+        if (!Files.exists(Paths.get(WritePath))) {
             pathAsFile.mkdir();
         }
 
-        // Delete all files in directory if they exist
-        for (File file : pathAsFile.listFiles()) {
-            file.delete();
-        }
-
         Schema avroSchema = UserRank.getClassSchema();
-        MessageType parquetSchema = new AvroSchemaConverter().convert(avroSchema);
 
         UserRank dataToWrite[] = new UserRank[] {
                 new UserRank(1, 3),
                 new UserRank(2, 0),
                 new UserRank(3, 100)
         };
+    
+        String NewFile = GenerateParquetFileName(new File(WritePath)); // <- Change to Write folder!
 
-        Path filePath = new Path(Writepath + "/example.parquet");
+        Path filePath = new Path(WritePath + "/" + NewFile);
         int pageSize = 65535;
 
         // Write to parquet with AvroParquetWriter
