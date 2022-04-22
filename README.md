@@ -15,11 +15,17 @@ mvn clean package
 java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App
 ```
 
-Run as standalone jar:
+Run as fat standalone jar:
 ```bash
 /workspaces/kafka-delta-ingest-adls
 mvn clean package
 java -jar target/my-app-1.0-SNAPSHOT.jar
+```
+
+Run via maven:
+```
+mvn clean package
+mvn exec:java -D exec.mainClass=com.mycompany.app.App
 ```
 
 ## Run Spark locally

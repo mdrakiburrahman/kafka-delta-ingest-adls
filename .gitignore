@@ -333,3 +333,6 @@ ASALocalRun/
 *.DS_Store
 
 target
+
+# Java garbage
+dependency-reduced-pom.xml
