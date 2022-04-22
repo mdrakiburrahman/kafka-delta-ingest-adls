@@ -23,9 +23,14 @@ java -jar target/my-app-1.0-SNAPSHOT.jar
 ```
 
 Run via maven:
-```
+```bash
 mvn clean package
 mvn exec:java -D exec.mainClass=com.mycompany.app.App
+```
+
+Run install, better than package:
+```bash
+mvn clean install && java -jar target/my-app-1.0-SNAPSHOT.jar
 ```
 
 ## Delta Table generation - run Spark locally
@@ -46,7 +51,7 @@ mvn exec:java -D exec.mainClass=com.mycompany.app.App
 Create a bunch of Delta files:
 
 ```scala
-val table = "/tmp/delta_standalone_test/"
+val table = "/tmp/delta_standalone_read/"
 for (i <- 0 to 2) { // 3 Delta Versions - Scala loops are inclusive of bound
    spark.range(i * 10, (i + 1) * 10)
       .map(x => (x, x % 5, s"foo-${x % 2}"))

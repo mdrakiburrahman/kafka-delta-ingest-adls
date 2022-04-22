@@ -336,3 +336,9 @@ target
 
 # Java garbage
 dependency-reduced-pom.xml
+
+# Ignore all files and folders starting with a dot
+.settings/*
+.project
+.dependency-reduced-pom.xml
+.project
