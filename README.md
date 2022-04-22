@@ -28,7 +28,7 @@ mvn clean package
 mvn exec:java -D exec.mainClass=com.mycompany.app.App
 ```
 
-## Run Spark locally
+## Delta Table generation - run Spark locally
 
 ```bash
 /opt/spark/sbin/start-master.sh # http://localhost:8080/ Master UI
