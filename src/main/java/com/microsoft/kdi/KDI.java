@@ -129,7 +129,6 @@ public class KDI {
 
     /**
      * Generate the name of a parquet file : ADLS
-     * 
      */
     public static String GenerateParquetFileNameADLS(DataLakeFileSystemClient adls_fileSystemClient, String WriteDir) {
         String FileName = "";
@@ -173,96 +172,44 @@ public class KDI {
     }
 
     /**
-     * Creates a parquet file and INSERTs into a Delta table: Local
+     * Suported storages
      */
-    public static void WriteToDeltaLocal(DeltaLog log, Configuration conf, Path WritePath, String WriteDir,
-            UserRank dataToWrite[], Schema avroSchema, StructType javaSchema) {
-
-        // Create directory if not exists - we need this for our Parquet unique name
-        // generator
-        File pathAsFile = new File(WriteDir);
-        // Create directory if it doesn't exist
-        if (!Files.exists(Paths.get(WriteDir))) {
-            pathAsFile.mkdir();
-        }
-
-        // Variables for both routes
-        String NewFile = GenerateParquetFileNameLocal(new File(WriteDir));
-        Path filePath = new Path("/" + NewFile);
-        filePath = Path.mergePaths(WritePath, filePath);
-
-        // Write to parquet with AvroParquetWriter
-        try (
-                ParquetWriter<UserRank> writer = AvroParquetWriter.<UserRank>builder(filePath)
-                        .withSchema(avroSchema)
-                        .withCompressionCodec(CompressionCodecName.SNAPPY)
-                        .withPageSize(65535)
-                        .withDictionaryEncoding(true)
-                        .build()) {
-            for (UserRank userRank : dataToWrite) {
-                writer.write(userRank);
-            }
-        } catch (java.io.IOException e) {
-            System.out.println(String.format("Error writing parquet file %s", e.getMessage()));
-            e.printStackTrace();
-        }
-
-        // Commit Delta Table Transaction - add the NewFile to Delta Table - creates
-        // table if not exists
-        try {
-            OptimisticTransaction txn = log.startTransaction(); // Start a new transaction
-            Metadata metadata = Metadata.builder().schema(javaSchema).build();
-
-            // If Delta table does not exist, add schema
-            // We don't want to double add this because that will cause an error during
-            // reads
-            if (!(log.snapshot().getVersion() > -1)) {
-                txn.updateMetadata(metadata);
-            }
-
-            // Find parquet files that match the filename (which is unique)
-            // We keep it this way so if we want to add more files later, we can just add
-            // them to the list of patterns
-            FileSystem fs = WritePath.getFileSystem(conf);
-            List<FileStatus> files = Arrays.stream(fs.listStatus(WritePath))
-                    .filter(f -> f.isFile() && f.getPath().getName().equals(NewFile))
-                    .collect(Collectors.toList());
-
-            // Generate Delta "AddFiles"
-            List<AddFile> addFiles = files.stream().map(file -> {
-                return new AddFile(
-                        // if targetPath is not a prefix, relativize returns the path unchanged
-                        WritePath.toUri().relativize(file.getPath().toUri()).toString(), // path
-                        Collections.emptyMap(), // partitionValues
-                        file.getLen(), // size
-                        file.getModificationTime(), // modificationTime
-                        true, // dataChange
-                        null, // stats
-                        null // tags
-                );
-            }).collect(Collectors.toList());
-
-            final String engineInfo = "kdi-adls";
-            txn.commit(addFiles, new Operation(Operation.Name.WRITE), engineInfo);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public enum Storage {
+        LOCAL,
+        ADLS
     }
 
     /**
-     * Creates a parquet file and INSERTs into a Delta table: ADLS
+     * Creates a parquet file and INSERTs into a Delta table - handles LOCAL and ADLS
      */
-    public static void WriteToDeltaADLS(DataLakeFileSystemClient adls_fileSystemClient, DeltaLog log,
-            Configuration conf, Path WritePath, String WriteDir,
-            UserRank dataToWrite[], Schema avroSchema, StructType javaSchema) {
-
-        // Our directory is already created at this point
-
-        String NewFile = GenerateParquetFileNameADLS(adls_fileSystemClient, WriteDir);
-
-        Path filePath = new Path("/" + NewFile);
-        filePath = Path.mergePaths(WritePath, filePath);
+    public static void WriteToDelta(Storage storageType, DataLakeFileSystemClient adls_fileSystemClient, DeltaLog log, Configuration conf, Path WritePath, String WriteDir, UserRank dataToWrite[], Schema avroSchema, StructType javaSchema) 
+    {
+        // Common Variables
+        Path filePath = null;
+        final String NewFile;
+        
+        // Deal with LOCAL and ADLS
+        if( storageType == Storage.LOCAL ) 
+        {
+            // Create directory if not exists - we need this for our Parquet unique name generator
+            File pathAsFile = new File(WriteDir);
+            // Create directory if it doesn't exist
+            if (!Files.exists(Paths.get(WriteDir))) {
+                pathAsFile.mkdir();
+            }
+            // Variables for both routes
+            NewFile = GenerateParquetFileNameLocal(new File(WriteDir));
+            filePath = new Path("/" + NewFile);
+            filePath = Path.mergePaths(WritePath, filePath);
+        } else if( storageType == Storage.ADLS ) 
+        {
+            // Our directory is already created at this point in ADLS
+            NewFile = GenerateParquetFileNameADLS(adls_fileSystemClient, WriteDir);
+            filePath = new Path("/" + NewFile);
+            filePath = Path.mergePaths(WritePath, filePath);
+        } else {
+            throw new IllegalArgumentException("Storage type not supported");
+        }
 
         // Write to parquet with AvroParquetWriter
         try (
@@ -442,8 +389,7 @@ public class KDI {
         // = = = = = = =
         System.out.println(MessageFormat.format("Writing Delta To: {0}", Dir_local));
         DeltaLog local_write_log = DeltaLog.forTable(local_config, Path_local);
-        WriteToDeltaLocal(local_write_log, local_config, Path_local, Dir_local, dataToWrite,
-                UserRank.getClassSchema(), JavaSchema);
+        WriteToDelta(Storage.LOCAL, null, local_write_log, local_config, Path_local, Dir_local, dataToWrite, UserRank.getClassSchema(), JavaSchema);
 
         // = = = = = =
         // Read: Local
@@ -459,8 +405,7 @@ public class KDI {
         DataLakeFileSystemClient adls_fileSystemClient = CreateDirectoryIfNotExists(adls_client,
                 System.getenv("ADLS_STORAGE_CDC_CONTAINER_NAME"), Dir_adls);
         DeltaLog adls_write_log = DeltaLog.forTable(adls_config, Path_adls);
-        WriteToDeltaADLS(adls_fileSystemClient, adls_write_log, adls_config, Path_adls, Dir_adls,
-                dataToWrite, UserRank.getClassSchema(), JavaSchema);
+        WriteToDelta(Storage.ADLS, adls_fileSystemClient, adls_write_log, adls_config, Path_adls, Dir_adls, dataToWrite, UserRank.getClassSchema(), JavaSchema);
 
         // = = = = = =
         // Read: ADLS

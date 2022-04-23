@@ -38,7 +38,7 @@ Run install, better than package:
 clear && mvn clean install && java -jar target/kdi-java-1.0-SNAPSHOT.jar
 ```
 
-To pipe logs
+To pipe logs in case of errors:
 ```bash
 java -jar target/kdi-java-1.0-SNAPSHOT.jar > err.txt 2>&1
 ```
