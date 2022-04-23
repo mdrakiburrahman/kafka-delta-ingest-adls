@@ -198,12 +198,45 @@ public class KDI {
         }
     }
 
+
+    /**  
+     * Generate an ADLS config object
+     */
+    public static Configuration GenerateADLSConfig(String accountName, String clientId, String clientSecret, String tenantId)
+    {  
+        Configuration conf = new Configuration();
+
+        // ADLS Config
+        conf.set(
+            MessageFormat.format("fs.azure.account.auth.type.{0}.dfs.core.windows.net", accountName),
+            "OAuth");
+        conf.set(
+            MessageFormat.format("fs.azure.account.oauth.provider.type.{0}.dfs.core.windows.net", accountName),
+            "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider");
+        conf.set(
+            MessageFormat.format("fs.azure.account.oauth2.client.id.{0}.dfs.core.windows.net", accountName),
+            clientId);
+        conf.set(
+            MessageFormat.format("fs.azure.account.oauth2.client.secret.{0}.dfs.core.windows.net", accountName),
+            clientSecret);
+        conf.set(
+            MessageFormat.format("fs.azure.account.oauth2.client.endpoint.{0}.dfs.core.windows.net", accountName),
+            MessageFormat.format("https://login.microsoftonline.com/{0}/oauth2/token", 
+            tenantId));
+        conf.set(
+        "io.delta.standalone.LOG_STORE_CLASS_KEY", 
+        "io.delta.standalone.internal.storage.AzureLogStore");
+
+        return conf;
+    }
+
+
     public static void main(String[] args) {
-        // = = = = = = 
-        // Write Demo
-        // = = = = = = 
-        String WritePath = "/tmp/delta_standalone_write";
-        System.out.println(MessageFormat.format("Creating Parquet To: {0}", WritePath));
+        // = = = = = = =
+        // Write: Local
+        // = = = = = = =
+        String WriteDir_local = "/tmp/delta_standalone_write";
+        System.out.println(MessageFormat.format("Writing Delta To: {0}", WriteDir_local));
 
         // Hard code schema for now - it's going to be static for Kafka anyway so we don't need to worry about it
         StructType schema = new StructType()
@@ -216,55 +249,39 @@ public class KDI {
             new UserRank(3, 100)
         };
 
-        WriteToDelta(WritePath, UserRank.getClassSchema(), dataToWrite, schema);
+        WriteToDelta(WriteDir_local, UserRank.getClassSchema(), dataToWrite, schema);
 
         // = = = = = = 
-        // Read Demo
+        // Read: Local
         // = = = = = = 
-        System.out.println(MessageFormat.format("Reading Delta Files From: {0}", WritePath));
-        DeltaLog kdi_read_log = DeltaLog.forTable(new Configuration(), WritePath);
+        String ReadDir_local = "/tmp/delta_standalone_write";
+        System.out.println(MessageFormat.format("Reading Delta Files From: {0}", ReadDir_local));
+        
+        Configuration local_config = new Configuration();
 
-        printSnapshotDetails("KDI table", kdi_read_log.snapshot());
+        DeltaLog local_read_log = DeltaLog.forTable(local_config, ReadDir_local);
 
-        // = = = = = = = = = =
-        // Read from ADLS demo
-        // = = = = = = = = = =
-        Configuration conf = new Configuration();
+        printSnapshotDetails("KDI table", local_read_log.snapshot());
 
-        // ADLS Config
-        conf.set(
-            MessageFormat.format("fs.azure.account.auth.type.{0}.dfs.core.windows.net", 
-            System.getenv("ADLS_STORAGE_ACCOUNT_NAME")),
-            "OAuth");
-        conf.set(
-            MessageFormat.format("fs.azure.account.oauth.provider.type.{0}.dfs.core.windows.net", 
-            System.getenv("ADLS_STORAGE_ACCOUNT_NAME")),
-            "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider");
-        conf.set(
-            MessageFormat.format("fs.azure.account.oauth2.client.id.{0}.dfs.core.windows.net", 
-            System.getenv("ADLS_STORAGE_ACCOUNT_NAME")),
-            System.getenv("ADLS_CLIENT_ID"));
-        conf.set(
-            MessageFormat.format("fs.azure.account.oauth2.client.secret.{0}.dfs.core.windows.net", 
-            System.getenv("ADLS_STORAGE_ACCOUNT_NAME")),
-            System.getenv("ADLS_CLIENT_SECRET"));
-        conf.set(
-            MessageFormat.format("fs.azure.account.oauth2.client.endpoint.{0}.dfs.core.windows.net", 
-            System.getenv("ADLS_STORAGE_ACCOUNT_NAME")),
-            MessageFormat.format("https://login.microsoftonline.com/{0}/oauth2/token", 
-            System.getenv("ADLS_CLIENT_TENANT")));
-        conf.set(
-        "io.delta.standalone.LOG_STORE_CLASS_KEY", 
-        "io.delta.standalone.internal.storage.AzureLogStore");
+        // = = = = = =
+        // Read: ADLS
+        // = = = = = =
+        String ReadDir_adls = "kafka/scene_raw";
+        System.out.println(MessageFormat.format("Reading Delta Files From: {0}", ReadDir_adls));
 
-        String DeltaTablePath = "kafka/scene_raw";
+        Configuration adls_config = GenerateADLSConfig(
+            System.getenv("ADLS_STORAGE_ACCOUNT_NAME"),
+            System.getenv("ADLS_CLIENT_ID"),
+            System.getenv("ADLS_CLIENT_SECRET"),
+            System.getenv("ADLS_CLIENT_TENANT")
+        );
 
-        Path DeltaPath = new Path(
+        Path ReadPath_adls = new Path(
             MessageFormat.format("abfs://{0}@{1}.dfs.core.windows.net/{2}", 
                 System.getenv("ADLS_STORAGE_CONTAINER_NAME"), 
                 System.getenv("ADLS_STORAGE_ACCOUNT_NAME"),
-                DeltaTablePath));
-        DeltaLog adls_read_log = DeltaLog.forTable(conf, DeltaPath);
+                ReadDir_adls));
+        DeltaLog adls_read_log = DeltaLog.forTable(adls_config, ReadPath_adls);
         
         printSnapshotDetails("ADLS table", adls_read_log.snapshot());
 
