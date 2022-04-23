@@ -33,7 +33,7 @@ Run install, better than package:
 mvn clean install && java -jar target/my-app-1.0-SNAPSHOT.jar
 ```
 
-## Delta Table generation - run Spark locally
+## Delta Table - run Spark locally
 
 ```bash
 /opt/spark/sbin/start-master.sh # http://localhost:8080/ Master UI
@@ -47,8 +47,7 @@ mvn clean install && java -jar target/my-app-1.0-SNAPSHOT.jar
 # [OPTIONAL] Go into PySpark Shell
 # /opt/spark/bin/pyspark
 ```
-
-Create a bunch of Delta files:
+### Write delta files
 
 ```scala
 val table = "/tmp/delta_standalone_read/"
@@ -88,6 +87,16 @@ ls /tmp/delta_standalone_test
 ls /tmp/delta_standalone_test/_delta_log/*.json
 # /tmp/delta_standalone_test/_delta_log/00000000000000000000.json  /tmp/delta_standalone_test/_delta_log/00000000000000000002.json
 # /tmp/delta_standalone_test/_delta_log/00000000000000000001.json
+```
+
+### Read delta files
+
+```scala
+val table = "/tmp/delta_standalone_write/"
+
+spark.read.format("delta").load(table).count
+
+spark.read.format("delta").load(table).show
 ```
 
 ## Debug locally
