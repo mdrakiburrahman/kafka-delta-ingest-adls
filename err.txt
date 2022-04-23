@@ -1,0 +1,42 @@
+Writing Delta To: /tmp/delta_standalone_write
+Reading Delta Files From: /tmp/delta_standalone_write
+
+===== Local table =====
+
+version: 3
+number data files: 4
+data files:
+part-00000-62ea37df-fa4a-431b-8e6c-b31a0d9e3ea6-c000.snappy.parquet
+part-00003-06804a86-bab9-4959-94d2-f16b796f4e81-c000.snappy.parquet
+part-00002-9da36de5-7e4c-4756-992b-75b824d033f8-c000.snappy.parquet
+part-00001-6082b0f5-6ffb-4df5-83ef-cabf994cfbc2-c000.snappy.parquet
+
+number of rows: 12
+data schema:
+root
+ |-- userId: integer (nullable = true) (metadata ={})
+ |-- rank: integer (nullable = true) (metadata ={})
+
+
+
+Writing Delta To: tmp/delta_standalone_write
+Reading Delta Files From: tmp/delta_standalone_write
+
+===== ADLS table =====
+
+version: 3
+number data files: 4
+data files:
+part-00000-2ebd6f21-406c-4097-b250-ce47f198fa28-c000.snappy.parquet
+part-00002-e6ce9cb2-0c94-4262-aecc-2e068e8de720-c000.snappy.parquet
+part-00003-04351abf-ee9e-492c-b44e-e350d0eb7b3d-c000.snappy.parquet
+part-00001-6fe56516-8883-4a9e-b4ad-ecdb4e8d6ffa-c000.snappy.parquet
+
+number of rows: 12
+data schema:
+root
+ |-- userId: integer (nullable = true) (metadata ={})
+ |-- rank: integer (nullable = true) (metadata ={})
+
+
+

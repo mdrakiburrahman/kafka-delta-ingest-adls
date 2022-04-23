@@ -62,7 +62,7 @@
 				io.delta
 			</groupId>
 			<artifactId>
-				delta-standalone_2.12
+				delta-standalone_2.13
 			</artifactId>
 			<version>
 				0.4.0
@@ -76,7 +76,7 @@
 				hadoop-client
 			</artifactId>
 			<version>
-				3.2.0
+				3.3.2
 			</version>
 		</dependency>
 		<dependency>
@@ -87,18 +87,7 @@
 				hadoop-azure
 			</artifactId>
 			<version>
-				3.2.0
-			</version>
-		</dependency>
-		<dependency>
-			<groupId>
-				org.apache.hadoop
-			</groupId>
-			<artifactId>
-				hadoop-azure-datalake
-			</artifactId>
-			<version>
-				3.2.0
+				3.3.2
 			</version>
 		</dependency>
 		<dependency>
@@ -153,7 +142,7 @@
 				parquet-hadoop
 			</artifactId>
 			<version>
-				1.10.1
+				1.12.2
 			</version>
 		</dependency>
 		<dependency>
@@ -164,7 +153,7 @@
 				parquet-avro
 			</artifactId>
 			<version>
-				1.10.1
+				1.12.2
 			</version>
 		</dependency>
 		<dependency>
@@ -175,7 +164,7 @@
 				avro
 			</artifactId>
 			<version>
-				1.9.0
+				1.11.0
 			</version>
 		</dependency>
 	</dependencies>

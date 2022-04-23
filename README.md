@@ -4,7 +4,7 @@
 
 Clean up Delta folders
 ```bash
-rf -rf /tmp/delta_standalone_write
+rm -rf /tmp/delta_standalone_write
 ```
 
 Run locally:
@@ -36,6 +36,11 @@ mvn exec:java -D exec.mainClass=com.microsoft.kdi.KDI
 Run install, better than package:
 ```bash
 clear && mvn clean install && java -jar target/kdi-java-1.0-SNAPSHOT.jar
+```
+
+To pipe logs
+```bash
+java -jar target/kdi-java-1.0-SNAPSHOT.jar > err.txt 2>&1
 ```
 
 ## Delta Table - run Spark locally

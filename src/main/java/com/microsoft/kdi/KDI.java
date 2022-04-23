@@ -15,23 +15,12 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 
 // ADLS stuff
-import com.azure.storage.common.StorageSharedKeyCredential;
-import com.azure.storage.file.datalake.DataLakeDirectoryClient;
-import com.azure.storage.file.datalake.DataLakeFileClient;
 import com.azure.storage.file.datalake.DataLakeFileSystemClient;
 import com.azure.storage.file.datalake.DataLakeServiceClient;
 import com.azure.storage.file.datalake.DataLakeServiceClientBuilder;
 import com.azure.storage.file.datalake.models.ListPathsOptions;
 import com.azure.storage.file.datalake.models.PathItem;
-import com.azure.storage.file.datalake.models.AccessControlChangeCounters;
-import com.azure.storage.file.datalake.models.AccessControlChangeResult;
-import com.azure.storage.file.datalake.models.AccessControlType;
-import com.azure.storage.file.datalake.models.PathAccessControl;
-import com.azure.storage.file.datalake.models.PathAccessControlEntry;
-import com.azure.storage.file.datalake.models.PathPermissions;
-import com.azure.storage.file.datalake.models.PathRemoveAccessControlEntry;
-import com.azure.storage.file.datalake.models.RolePermissions;
-import com.azure.storage.file.datalake.options.PathSetAccessControlRecursiveOptions;
+import com.azure.core.http.rest.PagedIterable;
 
 // Azure AD stuff
 import com.azure.identity.ClientSecretCredential;
@@ -87,7 +76,7 @@ public class KDI {
     }
 
     /**
-     * Generate the name of a parquet file
+     * Generate the name of a parquet file : Local
      * 
      * For example, if directory is empty:
      * 
@@ -98,7 +87,6 @@ public class KDI {
      * 
      * part-00001-5dc5f78d-38d1-449e-b72a-8c7d6cee1155-c000.snappy.parquet
      */
-
     public static String GenerateParquetFileNameLocal(File pathAsFile) {
         String FileName = "";
 
@@ -136,12 +124,56 @@ public class KDI {
                 FileName = "part-" + String.format("%05d", ++max) + "-" + Guid + "-c000.snappy.parquet";
             }
         }
-
         return FileName;
     }
 
     /**
-     * Creates a parquet file and INSERTs into a Delta table
+     * Generate the name of a parquet file : ADLS
+     * 
+     */
+    public static String GenerateParquetFileNameADLS(DataLakeFileSystemClient adls_fileSystemClient, String WriteDir) {
+        String FileName = "";
+
+        // Generate random Guid
+        String Guid = java.util.UUID.randomUUID().toString();
+
+        // For looping over all files in directory
+        ListPathsOptions options = new ListPathsOptions().setPath(WriteDir);
+        PagedIterable<PathItem> pagedIterable = adls_fileSystemClient.listPaths(options, null);
+        java.util.Iterator<PathItem> iterator = pagedIterable.iterator();
+
+        if (!iterator.hasNext()) // If no files exist, then use the default name
+        {
+            FileName = "part-00000-" + Guid + "-c000.snappy.parquet";
+        } else { // At least one file exists
+            // Find file that has the highest integer in part-XXXXX
+            int max = Integer.MIN_VALUE;
+
+            while (iterator.hasNext()) {
+                PathItem item = iterator.next();
+
+                // Split item.getName by "/" and return the last part
+                String[] fullName = item.getName().split("/");
+                String fileName = fullName[fullName.length - 1];
+
+                // If name does not match "_delta_log" or end with ".crc", consider
+                if (!fileName.equals("_delta_log") && !fileName.endsWith(".crc")) {
+                    // Get the integer part of the file name and update max
+                    String[] fileNameParts = fileName.split("-");
+                    int fileNamePart = Integer.parseInt(fileNameParts[1]);
+                    if (fileNamePart > max) {
+                        max = fileNamePart;
+                    }
+                }
+            }
+            // Generate new file name
+            FileName = "part-" + String.format("%05d", ++max) + "-" + Guid + "-c000.snappy.parquet";
+        }
+        return FileName;
+    }
+
+    /**
+     * Creates a parquet file and INSERTs into a Delta table: Local
      */
     public static void WriteToDeltaLocal(DeltaLog log, Configuration conf, Path WritePath, String WriteDir,
             UserRank dataToWrite[], Schema avroSchema, StructType javaSchema) {
@@ -156,6 +188,79 @@ public class KDI {
 
         // Variables for both routes
         String NewFile = GenerateParquetFileNameLocal(new File(WriteDir));
+        Path filePath = new Path("/" + NewFile);
+        filePath = Path.mergePaths(WritePath, filePath);
+
+        // Write to parquet with AvroParquetWriter
+        try (
+                ParquetWriter<UserRank> writer = AvroParquetWriter.<UserRank>builder(filePath)
+                        .withSchema(avroSchema)
+                        .withCompressionCodec(CompressionCodecName.SNAPPY)
+                        .withPageSize(65535)
+                        .withDictionaryEncoding(true)
+                        .build()) {
+            for (UserRank userRank : dataToWrite) {
+                writer.write(userRank);
+            }
+        } catch (java.io.IOException e) {
+            System.out.println(String.format("Error writing parquet file %s", e.getMessage()));
+            e.printStackTrace();
+        }
+
+        // Commit Delta Table Transaction - add the NewFile to Delta Table - creates
+        // table if not exists
+        try {
+            OptimisticTransaction txn = log.startTransaction(); // Start a new transaction
+            Metadata metadata = Metadata.builder().schema(javaSchema).build();
+
+            // If Delta table does not exist, add schema
+            // We don't want to double add this because that will cause an error during
+            // reads
+            if (!(log.snapshot().getVersion() > -1)) {
+                txn.updateMetadata(metadata);
+            }
+
+            // Find parquet files that match the filename (which is unique)
+            // We keep it this way so if we want to add more files later, we can just add
+            // them to the list of patterns
+            FileSystem fs = WritePath.getFileSystem(conf);
+            List<FileStatus> files = Arrays.stream(fs.listStatus(WritePath))
+                    .filter(f -> f.isFile() && f.getPath().getName().equals(NewFile))
+                    .collect(Collectors.toList());
+
+            // Generate Delta "AddFiles"
+            List<AddFile> addFiles = files.stream().map(file -> {
+                return new AddFile(
+                        // if targetPath is not a prefix, relativize returns the path unchanged
+                        WritePath.toUri().relativize(file.getPath().toUri()).toString(), // path
+                        Collections.emptyMap(), // partitionValues
+                        file.getLen(), // size
+                        file.getModificationTime(), // modificationTime
+                        true, // dataChange
+                        null, // stats
+                        null // tags
+                );
+            }).collect(Collectors.toList());
+
+            final String engineInfo = "kdi-adls";
+            txn.commit(addFiles, new Operation(Operation.Name.WRITE), engineInfo);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Creates a parquet file and INSERTs into a Delta table: ADLS
+     */
+    public static void WriteToDeltaADLS(DataLakeFileSystemClient adls_fileSystemClient, DeltaLog log,
+            Configuration conf, Path WritePath, String WriteDir,
+            UserRank dataToWrite[], Schema avroSchema, StructType javaSchema) {
+
+        // Our directory is already created at this point
+
+        String NewFile = GenerateParquetFileNameADLS(adls_fileSystemClient, WriteDir);
+
         Path filePath = new Path("/" + NewFile);
         filePath = Path.mergePaths(WritePath, filePath);
 
@@ -269,15 +374,15 @@ public class KDI {
     /**
      * Create an ADLS directory if not exists
      */
-    static public DataLakeDirectoryClient CreateDirectoryIfNotExists(DataLakeServiceClient serviceClient,
+    static public DataLakeFileSystemClient CreateDirectoryIfNotExists(DataLakeServiceClient serviceClient,
             String fileSystemName, String directoryName) {
         DataLakeFileSystemClient fileSystemClient = serviceClient.getFileSystemClient(fileSystemName);
 
-        if (fileSystemClient.getDirectoryClient(directoryName).exists()) {
-            return fileSystemClient.getDirectoryClient(directoryName);
-        } else {
-            return fileSystemClient.createDirectory(directoryName);
+        if (!(fileSystemClient.getDirectoryClient(directoryName).exists())) {
+            fileSystemClient.createDirectory(directoryName);
         }
+
+        return fileSystemClient;
     }
 
     public static void main(String[] args) {
@@ -285,17 +390,6 @@ public class KDI {
         // Logger
         // = = = =
         BasicConfigurator.configure();
-
-        // = = = = = = = = = = = = = = = =
-        // Generate Hadoop Config objects
-        // = = = = = = = = = = = = = = = =
-        Configuration local_config = new Configuration();
-
-        Configuration adls_config = GenerateADLSConfig(
-                System.getenv("ADLS_STORAGE_ACCOUNT_NAME"),
-                System.getenv("ADLS_CLIENT_ID"),
-                System.getenv("ADLS_CLIENT_SECRET"),
-                System.getenv("ADLS_CLIENT_TENANT"));
 
         // = = = = = = = = = = = = = =
         // Generate fake data + schema
@@ -310,6 +404,17 @@ public class KDI {
                 new UserRank(3, 100)
         };
 
+        // = = = = = = = = = = = = = = = =
+        // Generate Hadoop Config objects
+        // = = = = = = = = = = = = = = = =
+        Configuration local_config = new Configuration();
+
+        Configuration adls_config = GenerateADLSConfig(
+                System.getenv("ADLS_STORAGE_ACCOUNT_NAME"),
+                System.getenv("ADLS_CLIENT_ID"),
+                System.getenv("ADLS_CLIENT_SECRET"),
+                System.getenv("ADLS_CLIENT_TENANT"));
+
         // = = = = = = = = = =
         // ADLS Client object
         // = = = = = = = = = =
@@ -319,68 +424,49 @@ public class KDI {
                 System.getenv("ADLS_CLIENT_SECRET"),
                 System.getenv("ADLS_CLIENT_TENANT"));
 
+        // = = = = = = = = = =
+        // Paths: Local + ADLS
+        // = = = = = = = = = =
+        String Dir_local = "/tmp/delta_standalone_write";
+        String Dir_adls = "tmp/delta_standalone_write";
+
+        Path Path_local = new Path(Dir_local);
+        Path Path_adls = new Path(
+                MessageFormat.format("abfs://{0}@{1}.dfs.core.windows.net/{2}",
+                        System.getenv("ADLS_STORAGE_CDC_CONTAINER_NAME"),
+                        System.getenv("ADLS_STORAGE_ACCOUNT_NAME"),
+                        Dir_adls));
+
         // = = = = = = =
         // Write: Local
         // = = = = = = =
-        String WriteDir_local = "/tmp/delta_standalone_write";
-
-        System.out.println(MessageFormat.format("Writing Delta To: {0}", WriteDir_local));
-
-        Path WritePath_local = new Path(WriteDir_local);
-
-        DeltaLog local_write_log = DeltaLog.forTable(local_config, WritePath_local);
-
-        WriteToDeltaLocal(local_write_log, local_config, WritePath_local, WriteDir_local, dataToWrite,
+        System.out.println(MessageFormat.format("Writing Delta To: {0}", Dir_local));
+        DeltaLog local_write_log = DeltaLog.forTable(local_config, Path_local);
+        WriteToDeltaLocal(local_write_log, local_config, Path_local, Dir_local, dataToWrite,
                 UserRank.getClassSchema(), JavaSchema);
 
         // = = = = = =
         // Read: Local
         // = = = = = =
-        String ReadDir_local = "/tmp/delta_standalone_write";
-
-        System.out.println(MessageFormat.format("Reading Delta Files From: {0}", ReadDir_local));
-
-        DeltaLog local_read_log = DeltaLog.forTable(local_config, ReadDir_local);
-
+        System.out.println(MessageFormat.format("Reading Delta Files From: {0}", Dir_local));
+        DeltaLog local_read_log = DeltaLog.forTable(local_config, Dir_local);
         printSnapshotDetails("Local table", local_read_log.snapshot());
 
         // = = = = = = =
         // Write: ADLS
         // = = = = = = =
-        String WriteDir_adls = "tmp/delta_standalone_write";
-
-        DataLakeDirectoryClient adls_directory = CreateDirectoryIfNotExists(adls_client,
-                System.getenv("ADLS_STORAGE_FRAUD_CONTAINER_NAME"), WriteDir_adls);
-
-        System.out.println(MessageFormat.format("Writing Delta To: {0}", WriteDir_adls));
-
-        Path WritePath_adls = new Path(
-                MessageFormat.format("abfs://{0}@{1}.dfs.core.windows.net/{2}",
-                        System.getenv("ADLS_STORAGE_FRAUD_CONTAINER_NAME"), // <-- Container writing to
-                        System.getenv("ADLS_STORAGE_ACCOUNT_NAME"),
-                        WriteDir_adls));
-
-        // DeltaLog adls_write_log = DeltaLog.forTable(adls_config, WritePath_adls);
-        // Store adls = Store.ADLS;
-
-        // WriteToDelta(adls_write_log, adls, adls_config, WritePath_adls,
-        // WriteDir_adls, dataToWrite, UserRank.getClassSchema(), JavaSchema);
+        System.out.println(MessageFormat.format("Writing Delta To: {0}", Dir_adls));
+        DataLakeFileSystemClient adls_fileSystemClient = CreateDirectoryIfNotExists(adls_client,
+                System.getenv("ADLS_STORAGE_CDC_CONTAINER_NAME"), Dir_adls);
+        DeltaLog adls_write_log = DeltaLog.forTable(adls_config, Path_adls);
+        WriteToDeltaADLS(adls_fileSystemClient, adls_write_log, adls_config, Path_adls, Dir_adls,
+                dataToWrite, UserRank.getClassSchema(), JavaSchema);
 
         // = = = = = =
         // Read: ADLS
         // = = = = = =
-        String ReadDir_adls = "kafka/scene_raw";
-
-        System.out.println(MessageFormat.format("Reading Delta Files From: {0}", ReadDir_adls));
-
-        Path ReadPath_adls = new Path(
-                MessageFormat.format("abfs://{0}@{1}.dfs.core.windows.net/{2}",
-                        System.getenv("ADLS_STORAGE_FRAUD_CONTAINER_NAME"), // <-- Container reading from
-                        System.getenv("ADLS_STORAGE_ACCOUNT_NAME"),
-                        ReadDir_adls));
-
-        DeltaLog adls_read_log = DeltaLog.forTable(adls_config, ReadPath_adls);
-
+        System.out.println(MessageFormat.format("Reading Delta Files From: {0}", Dir_adls));
+        DeltaLog adls_read_log = DeltaLog.forTable(adls_config, Path_adls);
         printSnapshotDetails("ADLS table", adls_read_log.snapshot());
 
     }
