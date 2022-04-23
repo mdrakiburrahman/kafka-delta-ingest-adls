@@ -2,6 +2,11 @@
 
 ## Build and run locally
 
+Clean up Delta folders
+```bash
+rf -rf /tmp/delta_standalone_write
+```
+
 Run locally:
 ```bash
 cd /workspaces/kafka-delta-ingest-adls/src/main/java/com/mycompany/app
