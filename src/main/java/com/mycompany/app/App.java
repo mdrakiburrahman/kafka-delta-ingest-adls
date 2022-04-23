@@ -225,5 +225,49 @@ public class App {
         DeltaLog kdi_read_log = DeltaLog.forTable(new Configuration(), WritePath);
 
         printSnapshotDetails("KDI table", kdi_read_log.snapshot());
+
+        // = = = = = = = = = =
+        // Read from ADLS demo
+        // = = = = = = = = = =
+        Configuration conf = new Configuration();
+
+        // ADLS Config
+        conf.set(
+            MessageFormat.format("fs.azure.account.auth.type.{0}.dfs.core.windows.net", 
+            System.getenv("ADLS_STORAGE_ACCOUNT_NAME")),
+            "OAuth");
+        conf.set(
+            MessageFormat.format("fs.azure.account.oauth.provider.type.{0}.dfs.core.windows.net", 
+            System.getenv("ADLS_STORAGE_ACCOUNT_NAME")),
+            "org.apache.hadoop.fs.azurebfs.oauth2.ClientCredsTokenProvider");
+        conf.set(
+            MessageFormat.format("fs.azure.account.oauth2.client.id.{0}.dfs.core.windows.net", 
+            System.getenv("ADLS_STORAGE_ACCOUNT_NAME")),
+            System.getenv("ADLS_CLIENT_ID"));
+        conf.set(
+            MessageFormat.format("fs.azure.account.oauth2.client.secret.{0}.dfs.core.windows.net", 
+            System.getenv("ADLS_STORAGE_ACCOUNT_NAME")),
+            System.getenv("ADLS_CLIENT_SECRET"));
+        conf.set(
+            MessageFormat.format("fs.azure.account.oauth2.client.endpoint.{0}.dfs.core.windows.net", 
+            System.getenv("ADLS_STORAGE_ACCOUNT_NAME")),
+            MessageFormat.format("https://login.microsoftonline.com/{0}/oauth2/token", 
+            System.getenv("ADLS_CLIENT_TENANT")));
+        conf.set(
+        "io.delta.standalone.LOG_STORE_CLASS_KEY", 
+        "io.delta.standalone.internal.storage.AzureLogStore");
+
+        String DeltaTablePath = "kafka/scene_raw";
+
+        Path DeltaPath = new Path(
+            MessageFormat.format("abfs://{0}@{1}.dfs.core.windows.net/{2}", 
+                System.getenv("ADLS_STORAGE_CONTAINER_NAME"), 
+                System.getenv("ADLS_STORAGE_ACCOUNT_NAME"),
+                DeltaTablePath));
+        DeltaLog adls_read_log = DeltaLog.forTable(conf, DeltaPath);
+        
+        printSnapshotDetails("ADLS table", adls_read_log.snapshot());
+
     }
 }
+
