@@ -35,7 +35,7 @@ mvn exec:java -D exec.mainClass=com.mycompany.app.App
 
 Run install, better than package:
 ```bash
-mvn clean install && java -jar target/my-app-1.0-SNAPSHOT.jar
+clear && mvn clean install && java -jar target/my-app-1.0-SNAPSHOT.jar
 ```
 
 ## Delta Table - run Spark locally
