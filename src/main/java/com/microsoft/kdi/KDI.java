@@ -155,7 +155,7 @@ public class KDI {
         }
 
         // Variables for both routes
-        String NewFile = GenerateParquetFileNameLocal(new File(WriteDir)); 
+        String NewFile = GenerateParquetFileNameLocal(new File(WriteDir));
         Path filePath = new Path("/" + NewFile);
         filePath = Path.mergePaths(WritePath, filePath);
 
@@ -347,19 +347,18 @@ public class KDI {
         // = = = = = = =
         // Write: ADLS
         // = = = = = = =
-        // String WriteDir_adls = "tmp/delta_standalone_write";
+        String WriteDir_adls = "tmp/delta_standalone_write";
 
-        // DataLakeDirectoryClient adls_directory =
-        // CreateDirectoryIfNotExists(adls_client, "cdckafka", WriteDir_adls);
+        DataLakeDirectoryClient adls_directory = CreateDirectoryIfNotExists(adls_client,
+                System.getenv("ADLS_STORAGE_FRAUD_CONTAINER_NAME"), WriteDir_adls);
 
-        // System.out.println(MessageFormat.format("Writing Delta To: {0}",
-        // WriteDir_adls));
+        System.out.println(MessageFormat.format("Writing Delta To: {0}", WriteDir_adls));
 
-        // Path WritePath_adls = new Path(
-        // MessageFormat.format("abfs://{0}@{1}.dfs.core.windows.net/{2}",
-        // "cdckafka", // <------- REPLACE!!!!!!
-        // System.getenv("ADLS_STORAGE_ACCOUNT_NAME"),
-        // WriteDir_adls));
+        Path WritePath_adls = new Path(
+                MessageFormat.format("abfs://{0}@{1}.dfs.core.windows.net/{2}",
+                        System.getenv("ADLS_STORAGE_FRAUD_CONTAINER_NAME"), // <-- Container writing to
+                        System.getenv("ADLS_STORAGE_ACCOUNT_NAME"),
+                        WriteDir_adls));
 
         // DeltaLog adls_write_log = DeltaLog.forTable(adls_config, WritePath_adls);
         // Store adls = Store.ADLS;
@@ -376,7 +375,7 @@ public class KDI {
 
         Path ReadPath_adls = new Path(
                 MessageFormat.format("abfs://{0}@{1}.dfs.core.windows.net/{2}",
-                        System.getenv("ADLS_STORAGE_CONTAINER_NAME"),
+                        System.getenv("ADLS_STORAGE_FRAUD_CONTAINER_NAME"), // <-- Container reading from
                         System.getenv("ADLS_STORAGE_ACCOUNT_NAME"),
                         ReadDir_adls));
 
