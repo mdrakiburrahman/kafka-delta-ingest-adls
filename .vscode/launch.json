@@ -4,8 +4,8 @@
             "type": "java",
             "name": "Launch App",
             "request": "launch",
-            "mainClass": "com.microsoft.kdi.App",
-            "projectName": "my-app"
+            "mainClass": "com.microsoft.kdi.KDI",
+            "projectName": "kdi-java"
         },
         {
             "type": "java",
@@ -14,9 +14,9 @@
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "stopOnEntry": false,
-            "mainClass": "com.microsoft.app.App",
+            "mainClass": "com.microsoft.kdi.KDI",
             "args": "",
-            "projectName": "my-app"
+            "projectName": "kdi-java"
         }
     ]
 }
