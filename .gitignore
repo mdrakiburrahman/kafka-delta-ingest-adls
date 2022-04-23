@@ -342,3 +342,4 @@ dependency-reduced-pom.xml
 .project
 .dependency-reduced-pom.xml
 .project
+tmp/*

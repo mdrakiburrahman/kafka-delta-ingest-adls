@@ -3,15 +3,15 @@
  *
  * DO NOT EDIT DIRECTLY
  */
-package com.mycompany.app;
+package com.microsoft.kdi;
 
 import org.apache.avro.specific.SpecificData;
 
 @SuppressWarnings("all")
 @org.apache.avro.specific.AvroGenerated
 public class UserRank extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = -5102124694970103966L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"UserRank\",\"namespace\":\"com.mycompany.app\",\"fields\":[{\"name\":\"userId\",\"type\":\"int\"},{\"name\":\"rank\",\"type\":\"int\"}]}");
+  private static final long serialVersionUID = -5429470775602213105L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"UserRank\",\"namespace\":\"com.microsoft.kdi\",\"fields\":[{\"name\":\"userId\",\"type\":\"int\"},{\"name\":\"rank\",\"type\":\"int\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
   @Deprecated public int userId;
   @Deprecated public int rank;
@@ -89,8 +89,8 @@ public class UserRank extends org.apache.avro.specific.SpecificRecordBase implem
    * Creates a new UserRank RecordBuilder.
    * @return A new UserRank RecordBuilder
    */
-  public static com.mycompany.app.UserRank.Builder newBuilder() {
-    return new com.mycompany.app.UserRank.Builder();
+  public static com.microsoft.kdi.UserRank.Builder newBuilder() {
+    return new com.microsoft.kdi.UserRank.Builder();
   }
 
   /**
@@ -98,8 +98,8 @@ public class UserRank extends org.apache.avro.specific.SpecificRecordBase implem
    * @param other The existing builder to copy.
    * @return A new UserRank RecordBuilder
    */
-  public static com.mycompany.app.UserRank.Builder newBuilder(com.mycompany.app.UserRank.Builder other) {
-    return new com.mycompany.app.UserRank.Builder(other);
+  public static com.microsoft.kdi.UserRank.Builder newBuilder(com.microsoft.kdi.UserRank.Builder other) {
+    return new com.microsoft.kdi.UserRank.Builder(other);
   }
 
   /**
@@ -107,8 +107,8 @@ public class UserRank extends org.apache.avro.specific.SpecificRecordBase implem
    * @param other The existing instance to copy.
    * @return A new UserRank RecordBuilder
    */
-  public static com.mycompany.app.UserRank.Builder newBuilder(com.mycompany.app.UserRank other) {
-    return new com.mycompany.app.UserRank.Builder(other);
+  public static com.microsoft.kdi.UserRank.Builder newBuilder(com.microsoft.kdi.UserRank other) {
+    return new com.microsoft.kdi.UserRank.Builder(other);
   }
 
   /**
@@ -129,7 +129,7 @@ public class UserRank extends org.apache.avro.specific.SpecificRecordBase implem
      * Creates a Builder by copying an existing Builder.
      * @param other The existing Builder to copy.
      */
-    private Builder(com.mycompany.app.UserRank.Builder other) {
+    private Builder(com.microsoft.kdi.UserRank.Builder other) {
       super(other);
       if (isValidValue(fields()[0], other.userId)) {
         this.userId = data().deepCopy(fields()[0].schema(), other.userId);
@@ -145,7 +145,7 @@ public class UserRank extends org.apache.avro.specific.SpecificRecordBase implem
      * Creates a Builder by copying an existing UserRank instance
      * @param other The existing instance to copy.
      */
-    private Builder(com.mycompany.app.UserRank other) {
+    private Builder(com.microsoft.kdi.UserRank other) {
             super(SCHEMA$);
       if (isValidValue(fields()[0], other.userId)) {
         this.userId = data().deepCopy(fields()[0].schema(), other.userId);
@@ -170,7 +170,7 @@ public class UserRank extends org.apache.avro.specific.SpecificRecordBase implem
       * @param value The value of 'userId'.
       * @return This builder.
       */
-    public com.mycompany.app.UserRank.Builder setUserId(int value) {
+    public com.microsoft.kdi.UserRank.Builder setUserId(int value) {
       validate(fields()[0], value);
       this.userId = value;
       fieldSetFlags()[0] = true;
@@ -190,7 +190,7 @@ public class UserRank extends org.apache.avro.specific.SpecificRecordBase implem
       * Clears the value of the 'userId' field.
       * @return This builder.
       */
-    public com.mycompany.app.UserRank.Builder clearUserId() {
+    public com.microsoft.kdi.UserRank.Builder clearUserId() {
       fieldSetFlags()[0] = false;
       return this;
     }
@@ -208,7 +208,7 @@ public class UserRank extends org.apache.avro.specific.SpecificRecordBase implem
       * @param value The value of 'rank'.
       * @return This builder.
       */
-    public com.mycompany.app.UserRank.Builder setRank(int value) {
+    public com.microsoft.kdi.UserRank.Builder setRank(int value) {
       validate(fields()[1], value);
       this.rank = value;
       fieldSetFlags()[1] = true;
@@ -228,7 +228,7 @@ public class UserRank extends org.apache.avro.specific.SpecificRecordBase implem
       * Clears the value of the 'rank' field.
       * @return This builder.
       */
-    public com.mycompany.app.UserRank.Builder clearRank() {
+    public com.microsoft.kdi.UserRank.Builder clearRank() {
       fieldSetFlags()[1] = false;
       return this;
     }

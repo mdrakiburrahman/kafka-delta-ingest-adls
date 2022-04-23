@@ -4,12 +4,12 @@
 
 Clean up Delta folders
 ```bash
-rf -rf /tmp/delta_standalone_write
+rm -rf /tmp/delta_standalone_write
 ```
 
 Run locally:
 ```bash
-cd /workspaces/kafka-delta-ingest-adls/src/main/java/com/mycompany/app
+cd /workspaces/kafka-delta-ingest-adls/src/main/java/com/microsoft/app
 java App.java
 ```
 
@@ -17,25 +17,30 @@ Run via Maven with `java -cp`:
 ```bash
 /workspaces/kafka-delta-ingest-adls
 mvn clean package
-java -cp target/my-app-1.0-SNAPSHOT.jar com.mycompany.app.App
+java -cp target/kdi-java-1.0-SNAPSHOT.jar com.microsoft.kdi.KDI
 ```
 
 Run as fat standalone jar:
 ```bash
 /workspaces/kafka-delta-ingest-adls
 mvn clean package
-java -jar target/my-app-1.0-SNAPSHOT.jar
+java -jar target/kdi-java-1.0-SNAPSHOT.jar
 ```
 
 Run via maven:
 ```bash
 mvn clean package
-mvn exec:java -D exec.mainClass=com.mycompany.app.App
+mvn exec:java -D exec.mainClass=com.microsoft.kdi.KDI
 ```
 
 Run install, better than package:
 ```bash
-mvn clean install && java -jar target/my-app-1.0-SNAPSHOT.jar
+clear && mvn clean install && java -jar target/kdi-java-1.0-SNAPSHOT.jar
+```
+
+To pipe logs in case of errors:
+```bash
+java -jar target/kdi-java-1.0-SNAPSHOT.jar > err.txt 2>&1
 ```
 
 ## Delta Table - run Spark locally
@@ -107,16 +112,16 @@ spark.read.format("delta").load(table).show
 ## Debug locally
 
 1. **Edit:**
-   - Open `src/main/java/com/mycompany/app/App.java`.
+   - Open `src/main/java/com/microsoft/app/App.java`.
    - Try adding some code and check out the language features.
    - Notice that the Java extension pack is already installed in the container since the `.devcontainer/devcontainer.json` lists `"vscjava.vscode-java-pack"` as an extension to install automatically when the container is created.
 2. **Terminal:** Press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>\`</kbd> and type `uname` and other Linux commands from the terminal window.
 3. **Build, Run, and Debug:**
-   - Open `src/main/java/com/mycompany/app/App.java`.
+   - Open `src/main/java/com/microsoft/app/App.java`.
    - Add a breakpoint.
    - Press <kbd>F5</kbd> to launch the app in the container.
    - Once the breakpoint is hit, try hovering over variables, examining locals, and more.
 4. **Run a Test:**
-   - Open `src/test/java/com/mycompany/app/AppTest.java`.
+   - Open `src/test/java/com/microsoft/app/AppTest.java`.
    - Put a breakpoint in a test.
    - Click the `Debug Test` in the Code Lens above the function and watch it hit the breakpoint.

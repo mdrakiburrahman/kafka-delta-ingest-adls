@@ -3,10 +3,10 @@
 		4.0.0
 	</modelVersion>
 	<groupId>
-		com.mycompany.app
+		com.microsoft.kdi
 	</groupId>
 	<artifactId>
-		my-app
+		kdi-java
 	</artifactId>
 	<packaging>
 		jar
@@ -15,12 +15,34 @@
 		1.0-SNAPSHOT
 	</version>
 	<name>
-		my-app
+		kdi-java
 	</name>
 	<url>
 		http://maven.apache.org
 	</url>
 	<dependencies>
+		<dependency>
+			<groupId>
+				org.slf4j
+			</groupId>
+			<artifactId>
+				slf4j-api
+			</artifactId>
+			<version>
+				1.7.36
+			</version>
+		</dependency>
+		<dependency>
+			<groupId>
+				org.slf4j
+			</groupId>
+			<artifactId>
+				slf4j-simple
+			</artifactId>
+			<version>
+				1.7.36
+			</version>
+		</dependency>
 		<dependency>
 			<groupId>
 				junit
@@ -40,7 +62,7 @@
 				io.delta
 			</groupId>
 			<artifactId>
-				delta-standalone_2.12
+				delta-standalone_2.13
 			</artifactId>
 			<version>
 				0.4.0
@@ -54,7 +76,62 @@
 				hadoop-client
 			</artifactId>
 			<version>
-				3.2.0
+				3.3.2
+			</version>
+		</dependency>
+		<dependency>
+			<groupId>
+				org.apache.hadoop
+			</groupId>
+			<artifactId>
+				hadoop-azure
+			</artifactId>
+			<version>
+				3.3.2
+			</version>
+		</dependency>
+		<dependency>
+			<groupId>
+				com.azure
+			</groupId>
+			<artifactId>
+				azure-storage-file-datalake
+			</artifactId>
+			<version>
+				12.9.0
+			</version>
+		</dependency>
+		<dependency>
+			<groupId>
+				com.azure
+			</groupId>
+			<artifactId>
+				azure-identity
+			</artifactId>
+			<version>
+				1.5.0
+			</version>
+		</dependency>
+		<dependency>
+			<groupId>
+				com.fasterxml.jackson.core
+			</groupId>
+			<artifactId>
+				jackson-databind
+			</artifactId>
+			<version>
+				2.13.2.2
+			</version>
+		</dependency>
+		<dependency>
+			<groupId>
+				org.wildfly.openssl
+			</groupId>
+			<artifactId>
+				wildfly-openssl
+			</artifactId>
+			<version>
+				2.2.0.Final
 			</version>
 		</dependency>
 		<dependency>
@@ -65,7 +142,7 @@
 				parquet-hadoop
 			</artifactId>
 			<version>
-				1.10.1
+				1.12.2
 			</version>
 		</dependency>
 		<dependency>
@@ -76,7 +153,7 @@
 				parquet-avro
 			</artifactId>
 			<version>
-				1.10.1
+				1.12.2
 			</version>
 		</dependency>
 		<dependency>
@@ -87,7 +164,7 @@
 				avro
 			</artifactId>
 			<version>
-				1.9.0
+				1.11.0
 			</version>
 		</dependency>
 	</dependencies>
@@ -172,6 +249,27 @@
 								shade
 							</goal>
 						</goals>
+						<configuration>
+							<filters>
+								<filter>
+									<artifact>
+										*:*
+									</artifact>
+									<!-- https://stackoverflow.com/a/6743609/8954538 -->
+									<excludes>
+										<exclude>
+											META-INF/*.SF
+										</exclude>
+										<exclude>
+											META-INF/*.DSA
+										</exclude>
+										<exclude>
+											META-INF/*.RSA
+										</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -190,7 +288,7 @@
 					<archive>
 						<manifest>
 							<mainClass>
-								com.mycompany.app.App
+								com.microsoft.kdi.KDI
 								<!-- Entry point -->
 							</mainClass>
 						</manifest>
