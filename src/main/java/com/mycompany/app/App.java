@@ -2,19 +2,26 @@ package com.mycompany.app;
 
 // https://delta-io.github.io/connectors/latest/delta-standalone/api/java/io/delta/standalone/Snapshot.html
 import io.delta.standalone.DeltaLog;
+import io.delta.standalone.Operation;
+import io.delta.standalone.OptimisticTransaction;
 import io.delta.standalone.Snapshot;
+import io.delta.standalone.actions.*;
 import io.delta.standalone.data.CloseableIterator;
 import io.delta.standalone.data.RowRecord;
+import io.delta.standalone.types.*;
 
 // Hadoop stuff
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
 
 // Java file stuff
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.*;
+import java.util.stream.*;
 
 // Generic Avro dependencies
 import org.apache.avro.Schema;
@@ -107,19 +114,23 @@ public class App {
         return FileName;
     }
 
-    public static void main(String[] args) {
-        // = = = = = = = = = = = =
-        // Read Demo
-        // = = = = = = = = = = = =
-        String ReadPath = "/tmp/delta_standalone_read";
-        System.out.println(MessageFormat.format("Reading pre-created Delta Files From: {0}", ReadPath));
-
+    public static void ReadFromExistingTable (String ReadPath)
+    {
         DeltaLog log = DeltaLog.forTable(new Configuration(), ReadPath);
 
         printSnapshotDetails("current snapshot", log.snapshot());
         printSnapshotDetails("version 0 snapshot", log.getSnapshotForVersionAsOf(0));
         printSnapshotDetails("version 1 snapshot", log.getSnapshotForVersionAsOf(1));
         printSnapshotDetails("version 2 snapshot", log.getSnapshotForVersionAsOf(2));
+    }
+
+    public static void main(String[] args) {
+        // = = = = = = = = = = = =
+        // Read Demo
+        // = = = = = = = = = = = =
+        String ReadPath = "/tmp/delta_standalone_read";
+        System.out.println(MessageFormat.format("Reading pre-created Delta Files From: {0}", ReadPath));
+        ReadFromExistingTable(ReadPath);
 
         // = = = = = = = = = = = =
         // Write Demo
@@ -160,6 +171,52 @@ public class App {
             }
         } catch (java.io.IOException e) {
             System.out.println(String.format("Error writing parquet file %s", e.getMessage()));
+            e.printStackTrace();
+        }
+
+        // Commit Delta Table Transaction
+        Path DeltaPath = new Path(WritePath);
+        Configuration conf = new Configuration();
+        DeltaLog log = DeltaLog.forTable(conf, DeltaPath);
+
+        // Hard code schema for now - it's going to be static for Kafka anyway so we don't need to worry about it
+        StructType schema = new StructType()
+                    .add("userId", new IntegerType())
+                    .add("rank", new IntegerType());
+
+        // Create Delta Table if not exists
+        // ELSE, JUST ADD TO IT
+        // TODO: If not exists part
+        
+        try {
+            // Find parquet files
+            FileSystem fs = DeltaPath.getFileSystem(conf);
+            List<FileStatus> files = Arrays.stream(fs.listStatus(DeltaPath))
+                    .filter(f -> f.isFile() && f.getPath().getName().endsWith(".parquet"))
+                    .collect(Collectors.toList());
+            
+            // Generate Delta "AddFiles"
+            List<AddFile> addFiles = files.stream().map(file -> {
+                return new AddFile(
+                        // if targetPath is not a prefix, relativize returns the path unchanged
+                        DeltaPath.toUri().relativize(file.getPath().toUri()).toString(),     // path
+                        Collections.emptyMap(),                                             // partitionValues
+                        file.getLen(),                                                      // size
+                        file.getModificationTime(),                                         // modificationTime
+                        true,                                                               // dataChange
+                        null,                                                               // stats
+                        null                                                                // tags
+                );
+            }).collect(Collectors.toList());
+
+            Metadata metadata = Metadata.builder().schema(schema).build();
+
+            OptimisticTransaction txn = log.startTransaction();
+            txn.updateMetadata(metadata);
+            final String engineInfo = "kdi-adls";
+            txn.commit(addFiles, new Operation(Operation.Name.CONVERT), engineInfo); // <- Change to ADD
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
