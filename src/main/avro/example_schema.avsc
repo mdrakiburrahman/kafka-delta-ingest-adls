@@ -1,6 +1,6 @@
 {
     "type": "record",
-    "namespace": "com.mycompany.app",
+    "namespace": "com.microsoft.kdi",
     "name": "UserRank",
     "fields": [
       { "name": "userId", "type": "int" },

@@ -4,10 +4,17 @@
             "type": "java",
             "name": "Launch App",
             "request": "launch",
+            "mainClass": "com.microsoft.kdi.App",
+            "projectName": "my-app"
+        },
+        {
+            "type": "java",
+            "name": "Launch App",
+            "request": "launch",
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",
             "stopOnEntry": false,
-            "mainClass": "com.mycompany.app.App",
+            "mainClass": "com.microsoft.app.App",
             "args": "",
             "projectName": "my-app"
         }

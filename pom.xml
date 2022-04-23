@@ -3,10 +3,10 @@
 		4.0.0
 	</modelVersion>
 	<groupId>
-		com.mycompany.app
+		com.microsoft.kdi
 	</groupId>
 	<artifactId>
-		my-app
+		kdi-java
 	</artifactId>
 	<packaging>
 		jar
@@ -15,7 +15,7 @@
 		1.0-SNAPSHOT
 	</version>
 	<name>
-		my-app
+		kdi-java
 	</name>
 	<url>
 		http://maven.apache.org
@@ -244,7 +244,7 @@
 					<archive>
 						<manifest>
 							<mainClass>
-								com.mycompany.app.App
+								com.microsoft.kdi.KDI
 								<!-- Entry point -->
 							</mainClass>
 						</manifest>

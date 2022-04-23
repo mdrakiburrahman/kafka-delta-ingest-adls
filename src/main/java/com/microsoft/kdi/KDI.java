@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package com.microsoft.kdi;
 
 // https://delta-io.github.io/connectors/latest/delta-standalone/api/java/io/delta/standalone/Snapshot.html
 import io.delta.standalone.DeltaLog;
@@ -33,7 +33,7 @@ import org.apache.parquet.hadoop.ParquetWriter;
 // Avro->Parquet dependencies
 import org.apache.parquet.avro.AvroParquetWriter;
 
-public class App {
+public class KDI {
     /**
      *  Generate stats about the Delta table
      *  - Number of rows

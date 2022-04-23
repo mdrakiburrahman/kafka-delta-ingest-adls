@@ -1,12 +1,12 @@
-package com.mycompany.app;
+package com.microsoft.kdi;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 
-public class AppTest
+public class KDITest
 {
-    public AppTest() {
+    public KDITest() {
     }
 
     @Test
