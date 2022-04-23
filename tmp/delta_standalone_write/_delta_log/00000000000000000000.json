@@ -1,3 +1,0 @@
-{"commitInfo":{"timestamp":1650751840837,"operation":"WRITE","operationParameters":{},"isolationLevel":"SnapshotIsolation","isBlindAppend":true,"operationMetrics":{},"engineInfo":"kdi-adls Delta-Standalone/0.4.0"}}
-{"protocol":{"minReaderVersion":1,"minWriterVersion":2}}
-{"metaData":{"id":"af95cb20-d3e4-4629-927e-04c2e572033e","format":{"provider":"parquet","options":{}},"schemaString":"{\"type\":\"struct\",\"fields\":[{\"name\":\"userId\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}},{\"name\":\"rank\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}}]}","partitionColumns":[],"configuration":{},"createdTime":1650751813663}}
