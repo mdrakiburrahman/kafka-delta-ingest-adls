@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "namespace": "com.microsoft.kdi",
+  "name": "KafkaMessage",
+  "fields": [
+    { "name": "topic", "type": "string" },
+    { "name": "key", "type": "string" },
+    { "name": "value", "type": "string" },
+    { "name": "offset", "type": "long" },
+    { "name": "partition", "type": "int" },
+    { "name": "timestamp", "type": "long" }
+  ]
+}

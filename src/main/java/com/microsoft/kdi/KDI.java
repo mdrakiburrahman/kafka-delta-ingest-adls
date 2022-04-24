@@ -194,7 +194,7 @@ public final class KDI {
      * ADLS
      */
     public static void WriteToDelta(Storage storageType, DataLakeFileSystemClient adls_fileSystemClient, DeltaLog log,
-            Configuration conf, Path WritePath, String WriteDir, UserRank dataToWrite[], Schema avroSchema,
+            Configuration conf, Path WritePath, String WriteDir, KafkaMessage dataToWrite[], Schema avroSchema,
             StructType javaSchema) {
         // Common Variables
         Path filePath = null;
@@ -224,14 +224,14 @@ public final class KDI {
 
         // Write to parquet with AvroParquetWriter
         try (
-                ParquetWriter<UserRank> writer = AvroParquetWriter.<UserRank>builder(filePath)
+                ParquetWriter<KafkaMessage> writer = AvroParquetWriter.<KafkaMessage>builder(filePath)
                         .withSchema(avroSchema)
                         .withCompressionCodec(CompressionCodecName.SNAPPY)
                         .withPageSize(65535)
                         .withDictionaryEncoding(true)
                         .build()) {
-            for (UserRank userRank : dataToWrite) {
-                writer.write(userRank);
+            for (KafkaMessage KafkaMessage : dataToWrite) {
+                writer.write(KafkaMessage);
             }
         } catch (java.io.IOException e) {
             System.out.println(String.format("Error writing parquet file %s", e.getMessage()));
@@ -401,10 +401,10 @@ public final class KDI {
         // .add("userId", new IntegerType())
         // .add("rank", new IntegerType());
 
-        // UserRank dataToWrite[] = new UserRank[] {
-        // new UserRank(1, 3),
-        // new UserRank(2, 0),
-        // new UserRank(3, 100)
+        // KafkaMessage dataToWrite[] = new KafkaMessage[] {
+        // new KafkaMessage(1, 3),
+        // new KafkaMessage(2, 0),
+        // new KafkaMessage(3, 100)
         // };
 
         // // = = = = = = = = = = = = = = = =
@@ -446,7 +446,7 @@ public final class KDI {
         // System.out.println(MessageFormat.format("Writing Delta To: {0}", Dir_local));
         // DeltaLog local_write_log = DeltaLog.forTable(local_config, Path_local);
         // WriteToDelta(Storage.LOCAL, null, local_write_log, local_config, Path_local,
-        // Dir_local, dataToWrite, UserRank.getClassSchema(), JavaSchema);
+        // Dir_local, dataToWrite, KafkaMessage.getClassSchema(), JavaSchema);
 
         // // = = = = = =
         // // Read: Local
@@ -465,7 +465,7 @@ public final class KDI {
         // System.getenv("ADLS_STORAGE_CDC_CONTAINER_NAME"), Dir_adls);
         // DeltaLog adls_write_log = DeltaLog.forTable(adls_config, Path_adls);
         // WriteToDelta(Storage.ADLS, adls_fileSystemClient, adls_write_log,
-        // adls_config, Path_adls, Dir_adls, dataToWrite, UserRank.getClassSchema(),
+        // adls_config, Path_adls, Dir_adls, dataToWrite, KafkaMessage.getClassSchema(),
         // JavaSchema);
 
         // // = = = = = =
