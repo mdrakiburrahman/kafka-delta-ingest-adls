@@ -55,7 +55,7 @@ java -jar target/kdi-java-1.0-SNAPSHOT.jar > err.txt 2>&1
 /opt/kafka/bin/kafka-consumer-groups.sh \
   --bootstrap-server kafka:9092 \
   --delete-offsets \
-  --group basic-consumer-java \
+  --group kdi-java-1 \
   --topic server1.dbo.customers
 ```
 
