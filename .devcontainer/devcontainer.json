@@ -2,11 +2,17 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.195.0/containers/java
 {
 	"name": "Java",
+	// Mounts to docker in host
+	"mounts": [
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+		"source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind"
+	],
 	"runArgs": [
 		"--cap-add=SYS_PTRACE",
 		"--security-opt",
 		"seccomp=unconfined",
-		"--env-file=.devcontainer/devcontainer.env"
+		"--env-file=.devcontainer/devcontainer.env",
+		"--network=vnet"
 	],
 	"build": {
 		"dockerfile": "Dockerfile",
@@ -23,7 +29,7 @@
 		}
 	},
 
-	Set *default* container specific settings.json values on container create.
+	// Set *default* container specific settings.json values on container create.
 	"settings": { 
 		"java.home": "/docker-java-home",
 		"maven.executable.path": "/usr/local/sdkman/candidates/maven/current/bin/mvn"

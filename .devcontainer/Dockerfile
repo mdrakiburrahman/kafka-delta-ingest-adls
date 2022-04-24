@@ -17,7 +17,7 @@ ARG NODE_VERSION="none"
 RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
 
 # = = = = = = = = = = = = = = = = = = = = = = = =
-# Install Spark locally for development purposes
+# Install misc tools for development purposes
 # = = = = = = = = = = = = = = = = = = = = = = = =
 RUN apt-get update && apt-get upgrade -y && \
     apt-get -y install mlocate && \
@@ -30,3 +30,25 @@ RUN wget https://dlcdn.apache.org/spark/spark-3.1.2/spark-3.1.2-bin-hadoop3.2.tg
     mv spark-3.1.2-bin-hadoop3.2/* /opt/spark && \
     rm spark-3.1.2-bin-hadoop3.2.tgz && \
     rm -rf spark-3.1.2-bin-hadoop3.2
+
+# Install Apache Kafka 2.4.0
+RUN wget https://archive.apache.org/dist/kafka/2.4.0/kafka_2.13-2.4.0.tgz && \
+    tar -xvf kafka_2.13-2.4.0.tgz && \
+    mkdir /opt/kafka && \
+    mv kafka_2.13-2.4.0/* /opt/kafka && \
+    rm kafka_2.13-2.4.0.tgz && \
+    rm -rf kafka_2.13-2.4.0
+
+# Docker Compose version
+ARG COMPOSE_VERSION=1.24.0
+
+# Install Docker CE CLI
+RUN apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common lsb-release \
+    && curl -fsSL https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/gpg | (OUT=$(apt-key add - 2>&1) || echo $OUT) \
+    && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]') $(lsb_release -cs) stable" \
+    && apt-get update \
+    && apt-get install -y docker-ce-cli
+
+# Install Docker Compose
+RUN curl -sSL "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
+    && chmod +x /usr/local/bin/docker-compose
