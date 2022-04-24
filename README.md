@@ -1,5 +1,7 @@
 # kafka-delta-ingest-adls: Java
 
+![Architecture](_images/1.png)
+
 ## Build and run locally
 
 ### Quickstart
@@ -16,42 +18,7 @@ rm -rf /tmp/delta_standalone_write
 clear && mvn clean install && java -jar target/kdi-java-1.0-SNAPSHOT.jar
 ```
 
-Run `INSERTs` in [SQL DB in this repo](https://github.com/mdrakiburrahman/debezium-sql-linux) to generate CDC logs into Kafka:
-
-```sql
-USE testDB
-GO
-
--- CDC tables
-SELECT * FROM cdc.change_tables
-SELECT * FROM cdc.dbo_customers_CT
--- Data Tables
-SELECT * FROM customers;
-
--- INSERT statements
-USE testDB
-GO
-
-DROP PROCEDURE IF EXISTS dbo.RunInserts
-GO
-
-CREATE PROCEDURE dbo.RunInserts @Number int
-AS
-BEGIN
-	DECLARE
-		@Counter int= 1
-	WHILE @Counter< =@Number
-	BEGIN
-		INSERT INTO customers(first_name,last_name,email)
-		VALUES ('Raki','Rahman', CONCAT(NEWID (), '@microsoft.com'));
-		PRINT(@Counter)
-		SET @Counter= @Counter + 1
-	END
-END
-
-EXEC dbo.RunInserts 1000 -- <-- Tune as necessary
-SELECT COUNT(*) AS num_rows FROM customers;
-```
+Run large number of `INSERTs` in [SQL DB in this repo](https://github.com/mdrakiburrahman/debezium-sql-linux) to generate CDC logs into Kafka - see [Demo Script](_demo/demo.sql).
 
 ### Other details
 Run locally:

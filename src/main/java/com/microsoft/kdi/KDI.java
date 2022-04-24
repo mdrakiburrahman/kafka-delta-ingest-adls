@@ -381,12 +381,15 @@ public final class KDI {
             out.format("* partition: %s%n", record.partition());
             out.format("* timestamp: %s%n\n", record.timestamp());
 
+            // If record.value() is null, replace with empty string to avoid null pointer exception
+            String value = record.value() == null ? "" : record.value();
+
             // Convert to KafkaMessage
             KafkaMessage KafkaMessage = new KafkaMessage();
 
             KafkaMessage.setTopic(record.topic());
             KafkaMessage.setKey(record.key());
-            KafkaMessage.setValue(record.value());
+            KafkaMessage.setValue(value);
             KafkaMessage.setOffset(record.offset());
             KafkaMessage.setPartition(record.partition());
             KafkaMessage.setTimestamp(record.timestamp());
