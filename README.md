@@ -43,7 +43,23 @@ To pipe logs in case of errors:
 java -jar target/kdi-java-1.0-SNAPSHOT.jar > err.txt 2>&1
 ```
 
-## Delta Table - run Spark locally
+## Kafka stuff
+
+```bash
+# List topics
+/opt/kafka/bin/kafka-topics.sh \
+--bootstrap-server kafka:9092 \
+--list
+
+# Delete a Consumer Group from a topic - useful for reseting stream
+/opt/kafka/bin/kafka-consumer-groups.sh \
+  --bootstrap-server kafka:9092 \
+  --delete-offsets \
+  --group basic-consumer-java \
+  --topic server1.dbo.customers
+```
+
+## Spark stuff
 
 ```bash
 /opt/spark/sbin/start-master.sh # http://localhost:8080/ Master UI
