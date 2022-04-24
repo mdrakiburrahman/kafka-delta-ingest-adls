@@ -1,24 +1,91 @@
 # kafka-delta-ingest-adls: Java
 
+> An alternative to the official [`delta-io/kafka-delta-ingest`](https://github.com/delta-io/kafka-delta-ingest) which doesn't support Azure Storage yet
+
+**Diagram**
 ![Architecture](_images/1.png)
+
+**Demo**
+[![Demo](_images/2.png)](https://youtu.be/kvCOlpE4KGs)
 
 ## Build and run locally
 
 ### Quickstart
 Clean up Delta folders:
-
-**Local**
 ```bash
+# Local
 rm -rf /tmp/delta_standalone_write
-```
-**ADLS** - perform via Storage Explorer
 
-⭐ Run install, better than package:
+# ADLS - perform via Storage Explorer
+```
+
+JAR: `install` and Launch:
 ```bash
 clear && mvn clean install && java -jar target/kdi-java-1.0-SNAPSHOT.jar
 ```
 
-Run large number of `INSERTs` in [SQL DB in this repo](https://github.com/mdrakiburrahman/debezium-sql-linux) to generate CDC logs into Kafka - see [Demo Script](_demo/demo.sql).
+Run large number of `INSERTs` in [SQL DB env in this repo](https://github.com/mdrakiburrahman/debezium-sql-linux) to generate CDC logs into Kafka - see [Demo Script](_demo/demo.sql).
+
+---
+
+### TO-DO
+- [x]  Reads parquet from local
+- [x]  Writes parquet to local
+- [x]  Writes ***delta*** to local
+    - [x]  Read from Spark to ensure Data is good (append only for CDC so F UPSERTs)
+    - [x]  Read back
+    - [x]  Disable Spark dependency for file generation
+
+**ADLS**
+
+- [x]  Read existing Delta table  from ADLS
+- [x]  Writes ***delta*** to **ADLS**
+- [x]  Reads back written delta from ADLS
+
+**Kafka + CDC**
+
+- [x]  Kafka simple consumer app
+- [x]  Kafka Message Schema POJO
+- [x]  Go through Debezium example to see Payload structure as JSON for CRUD
+- [x]  Read with the simple Consumer from EffectiveKafka for now
+
+**Integrate to Delta**
+
+- [x]  Tackle reading a single topic/CDC table - similar to KDI - take as `env` var (scalable)
+- [x]  Write to Delta local/ADLS/whatever in real-time timestamp buffer with 1 parquet
+- [x]  Make the Delta folder semantics `Broker -> Topic -> consumer=...`
+- [x]  Continuous app that keeps track of offsets properly in Kafka if we kill it - i.e. no Data Loss
+
+**Databricks Parse**
+
+- [x]  Quick single notebook to demunge a single table, and the original SQL table
+
+**Documentation**
+
+- [x]  Document/Diagram/Demo
+
+**Perf optimization/Best Practices**
+
+- [ ]  Make the buffer logic smart, instead of Sleep - make it poll Kafka to build up the buffer
+    - [ ]  This means we can have Data loss as we `ack` messages - so we can’t use the Kafka `offset` anymore. We will need to look at `txn` thing deeper for KDI-rust
+- [ ]  Make Unit Tests
+- [ ]  Test out Horizontal Scalability/Partition Rebalance etc
+
+**Containerize**
+
+- [ ]  Containerize/Dockerize/Docker-Compose with env
+- [ ]  Kubernetes manifests
+
+“**Enterprise ready”**
+
+- [ ]  A Kubernetes Operator to inject Topic -> Delta Sink info - maybe wrap around a `ReplicaSet` for Horizontal Scalability?
+- [ ]  End-to-end demo with Confluent and Azure Arc SQL MI
+
+**Community?**
+
+- [ ]  Share with to Delta repo?
+
+---
 
 ### Other details
 Run locally:
