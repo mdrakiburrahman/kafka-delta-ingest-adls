@@ -2,11 +2,58 @@
 
 ## Build and run locally
 
-Clean up Delta folders
+### Quickstart
+Clean up Delta folders:
+
+**Local**
 ```bash
 rm -rf /tmp/delta_standalone_write
 ```
+**ADLS** - perform via Storage Explorer
 
+⭐ Run install, better than package:
+```bash
+clear && mvn clean install && java -jar target/kdi-java-1.0-SNAPSHOT.jar
+```
+
+Run `INSERTs` in [SQL DB in this repo](https://github.com/mdrakiburrahman/debezium-sql-linux) to generate CDC logs into Kafka:
+
+```sql
+USE testDB
+GO
+
+-- CDC tables
+SELECT * FROM cdc.change_tables
+SELECT * FROM cdc.dbo_customers_CT
+-- Data Tables
+SELECT * FROM customers;
+
+-- INSERT statements
+USE testDB
+GO
+
+DROP PROCEDURE IF EXISTS dbo.RunInserts
+GO
+
+CREATE PROCEDURE dbo.RunInserts @Number int
+AS
+BEGIN
+	DECLARE
+		@Counter int= 1
+	WHILE @Counter< =@Number
+	BEGIN
+		INSERT INTO customers(first_name,last_name,email)
+		VALUES ('Raki','Rahman', CONCAT(NEWID (), '@microsoft.com'));
+		PRINT(@Counter)
+		SET @Counter= @Counter + 1
+	END
+END
+
+EXEC dbo.RunInserts 1000 -- <-- Tune as necessary
+SELECT COUNT(*) AS num_rows FROM customers;
+```
+
+### Other details
 Run locally:
 ```bash
 cd /workspaces/kafka-delta-ingest-adls/src/main/java/com/microsoft/app
@@ -33,17 +80,28 @@ mvn clean package
 mvn exec:java -D exec.mainClass=com.microsoft.kdi.KDI
 ```
 
-Run install, better than package:
-```bash
-clear && mvn clean install && java -jar target/kdi-java-1.0-SNAPSHOT.jar
-```
-
 To pipe logs in case of errors:
 ```bash
 java -jar target/kdi-java-1.0-SNAPSHOT.jar > err.txt 2>&1
 ```
 
-## Delta Table - run Spark locally
+## Kafka stuff
+
+```bash
+# List topics
+/opt/kafka/bin/kafka-topics.sh \
+--bootstrap-server kafka:9092 \
+--list
+
+# Delete a Consumer Group from a topic - useful for reseting stream
+/opt/kafka/bin/kafka-consumer-groups.sh \
+  --bootstrap-server kafka:9092 \
+  --delete-offsets \
+  --group kdi-java-1 \
+  --topic server1.dbo.customers
+```
+
+## Spark stuff
 
 ```bash
 /opt/spark/sbin/start-master.sh # http://localhost:8080/ Master UI

@@ -1,5 +1,15 @@
 package com.microsoft.kdi;
 
+// Jave stuff
+import static java.lang.System.*;
+import java.time.*;
+import java.util.*;
+
+// Kafka stuff
+import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.common.serialization.*;
+
+// Delta stuff
 // https://delta-io.github.io/connectors/latest/delta-standalone/api/java/io/delta/standalone/Snapshot.html
 import io.delta.standalone.DeltaLog;
 import io.delta.standalone.Operation;
@@ -48,7 +58,7 @@ import org.apache.parquet.hadoop.ParquetWriter;
 // Avro->Parquet dependencies
 import org.apache.parquet.avro.AvroParquetWriter;
 
-public class KDI {
+public final class KDI {
     /**
      * Generate stats about the Delta table
      * - Number of rows
@@ -73,6 +83,24 @@ public class KDI {
         System.out.println("data schema:");
         System.out.println(row.getSchema().getTreeString());
         System.out.println("\n");
+    }
+
+    /**
+     * Perform local Delta read
+     */
+    public static void localRead(Configuration local_config,String Dir_local) {
+        System.out.println(MessageFormat.format("Reading Delta Files From: {0}", Dir_local));
+        DeltaLog local_read_log = DeltaLog.forTable(local_config, Dir_local);
+        printSnapshotDetails("Local table", local_read_log.snapshot());
+    }
+
+    /**
+     * Perform ADLS Delta read
+     */
+    public static void adlsRead(Configuration adls_config, String Dir_adls, Path Path_adls) {
+        System.out.println(MessageFormat.format("Reading Delta Files From: {0}", Dir_adls));
+        DeltaLog adls_read_log = DeltaLog.forTable(adls_config, Path_adls);
+        printSnapshotDetails("ADLS table", adls_read_log.snapshot());
     }
 
     /**
@@ -180,18 +208,20 @@ public class KDI {
     }
 
     /**
-     * Creates a parquet file and INSERTs into a Delta table - handles LOCAL and ADLS
+     * Creates a parquet file and INSERTs into a Delta table - handles LOCAL and
+     * ADLS
      */
-    public static void WriteToDelta(Storage storageType, DataLakeFileSystemClient adls_fileSystemClient, DeltaLog log, Configuration conf, Path WritePath, String WriteDir, UserRank dataToWrite[], Schema avroSchema, StructType javaSchema) 
-    {
+    public static void WriteToDelta(Storage storageType, DataLakeFileSystemClient adls_fileSystemClient, DeltaLog log,
+            Configuration conf, Path WritePath, String WriteDir, KafkaMessage dataToWrite[], Schema avroSchema,
+            StructType javaSchema) {
         // Common Variables
         Path filePath = null;
         final String NewFile;
-        
+
         // Deal with LOCAL and ADLS
-        if( storageType == Storage.LOCAL ) 
-        {
-            // Create directory if not exists - we need this for our Parquet unique name generator
+        if (storageType == Storage.LOCAL) {
+            // Create directory if not exists - we need this for our Parquet unique name
+            // generator
             File pathAsFile = new File(WriteDir);
             // Create directory if it doesn't exist
             if (!Files.exists(Paths.get(WriteDir))) {
@@ -201,8 +231,7 @@ public class KDI {
             NewFile = GenerateParquetFileNameLocal(new File(WriteDir));
             filePath = new Path("/" + NewFile);
             filePath = Path.mergePaths(WritePath, filePath);
-        } else if( storageType == Storage.ADLS ) 
-        {
+        } else if (storageType == Storage.ADLS) {
             // Our directory is already created at this point in ADLS
             NewFile = GenerateParquetFileNameADLS(adls_fileSystemClient, WriteDir);
             filePath = new Path("/" + NewFile);
@@ -213,14 +242,14 @@ public class KDI {
 
         // Write to parquet with AvroParquetWriter
         try (
-                ParquetWriter<UserRank> writer = AvroParquetWriter.<UserRank>builder(filePath)
+                ParquetWriter<KafkaMessage> writer = AvroParquetWriter.<KafkaMessage>builder(filePath)
                         .withSchema(avroSchema)
                         .withCompressionCodec(CompressionCodecName.SNAPPY)
                         .withPageSize(65535)
                         .withDictionaryEncoding(true)
                         .build()) {
-            for (UserRank userRank : dataToWrite) {
-                writer.write(userRank);
+            for (KafkaMessage KafkaMessage : dataToWrite) {
+                writer.write(KafkaMessage);
             }
         } catch (java.io.IOException e) {
             System.out.println(String.format("Error writing parquet file %s", e.getMessage()));
@@ -332,24 +361,72 @@ public class KDI {
         return fileSystemClient;
     }
 
+    /*
+     * Converts a set of Kafka records into a buffer array
+     */
+    static public KafkaMessage[] ConsumerRecordsToArray(ConsumerRecords<String, String> records) {
+
+        // Initialize dataToWrite with length of records count
+        KafkaMessage[] dataToWrite = new KafkaMessage[records.count()];
+
+        int i = 0;
+        for (ConsumerRecord<String, String> record : records) {
+            System.out.println(MessageFormat.format("\n--> Record {0}/{1}", i + 1, records.count()));
+
+            // Print record values
+            out.format("* topic: %s%n", record.topic());
+            out.format("* key: %s%n", record.key());
+            out.format("* value: %s%n", record.value());
+            out.format("* offset: %s%n", record.offset());
+            out.format("* partition: %s%n", record.partition());
+            out.format("* timestamp: %s%n\n", record.timestamp());
+
+            // Convert to KafkaMessage
+            KafkaMessage KafkaMessage = new KafkaMessage();
+
+            KafkaMessage.setTopic(record.topic());
+            KafkaMessage.setKey(record.key());
+            KafkaMessage.setValue(record.value());
+            KafkaMessage.setOffset(record.offset());
+            KafkaMessage.setPartition(record.partition());
+            KafkaMessage.setTimestamp(record.timestamp());
+
+            // Append to Writer
+            dataToWrite[i] = KafkaMessage;
+            i++;
+        }
+        return dataToWrite;
+    }
+
     public static void main(String[] args) {
+        // = = = = = = = = = = =
+        // Environment Variables
+        // = = = = = = = = = = =
+        final var topic = System.getenv("KAFKA_TOPIC");
+        final var broker = System.getenv("KAFKA_BROKER_ADDRESS");
+        final var consumer_self = System.getenv("KAFKA_CONSUMER_NAME_SELF");
+        final int buffer_duration = Integer.parseInt(System.getenv("KAFKA_BUFFER"));
+
         // = = = =
         // Logger
         // = = = =
         BasicConfigurator.configure();
 
         // = = = = = = = = = = = = = =
-        // Generate fake data + schema
+        // JavaSchema for Delta Log
         // = = = = = = = = = = = = = =
         StructType JavaSchema = new StructType()
-                .add("userId", new IntegerType())
-                .add("rank", new IntegerType());
+                .add("topic", new StringType())
+                .add("key", new StringType())
+                .add("value", new StringType())
+                .add("offset", new LongType())
+                .add("partition", new IntegerType())
+                .add("timestamp", new LongType());
 
-        UserRank dataToWrite[] = new UserRank[] {
-                new UserRank(1, 3),
-                new UserRank(2, 0),
-                new UserRank(3, 100)
-        };
+        // = = = = = =
+        // Our buffer
+        // = = = = = =
+        KafkaMessage dataToWrite[] = new KafkaMessage[] {};
 
         // = = = = = = = = = = = = = = = =
         // Generate Hadoop Config objects
@@ -374,8 +451,8 @@ public class KDI {
         // = = = = = = = = = =
         // Paths: Local + ADLS
         // = = = = = = = = = =
-        String Dir_local = "/tmp/delta_standalone_write";
-        String Dir_adls = "tmp/delta_standalone_write";
+        String Dir_local = "/tmp/delta_standalone_write"; // Local directories don't like funky characters
+        String Dir_adls = MessageFormat.format("{0}/{1}/kdi={2}", broker, topic, consumer_self); // No leading slash
 
         Path Path_local = new Path(Dir_local);
         Path Path_adls = new Path(
@@ -384,35 +461,74 @@ public class KDI {
                         System.getenv("ADLS_STORAGE_ACCOUNT_NAME"),
                         Dir_adls));
 
-        // = = = = = = =
-        // Write: Local
-        // = = = = = = =
-        System.out.println(MessageFormat.format("Writing Delta To: {0}", Dir_local));
-        DeltaLog local_write_log = DeltaLog.forTable(local_config, Path_local);
-        WriteToDelta(Storage.LOCAL, null, local_write_log, local_config, Path_local, Dir_local, dataToWrite, UserRank.getClassSchema(), JavaSchema);
-
         // = = = = = =
-        // Read: Local
+        // Kafka stuff
         // = = = = = =
-        System.out.println(MessageFormat.format("Reading Delta Files From: {0}", Dir_local));
-        DeltaLog local_read_log = DeltaLog.forTable(local_config, Dir_local);
-        printSnapshotDetails("Local table", local_read_log.snapshot());
+        System.out.println("\n==========================================================");
+        System.out.println(MessageFormat.format("➡  Kafka Broker: {0}", broker));
+        System.out.println(MessageFormat.format("➡  Kafka Topic: {0}", topic));
+        System.out.println(MessageFormat.format("➡  My Consumer Name: {0}", consumer_self));
+        System.out.println(MessageFormat.format("➡  Buffer Duration in ms: {0}", buffer_duration));
+        System.out.println("==========================================================\n");
 
-        // = = = = = = =
-        // Write: ADLS
-        // = = = = = = =
-        System.out.println(MessageFormat.format("Writing Delta To: {0}", Dir_adls));
-        DataLakeFileSystemClient adls_fileSystemClient = CreateDirectoryIfNotExists(adls_client,
-                System.getenv("ADLS_STORAGE_CDC_CONTAINER_NAME"), Dir_adls);
-        DeltaLog adls_write_log = DeltaLog.forTable(adls_config, Path_adls);
-        WriteToDelta(Storage.ADLS, adls_fileSystemClient, adls_write_log, adls_config, Path_adls, Dir_adls, dataToWrite, UserRank.getClassSchema(), JavaSchema);
+        // http://people.apache.org/~nehanarkhede/kafka-0.9-producer-javadoc/doc/org/apache/kafka/clients/consumer/ConsumerConfig.html
+        final Map<String, Object> config = Map.of(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, broker,
+                ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName(),
+                ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName(),
+                ConsumerConfig.GROUP_ID_CONFIG, consumer_self,
+                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest",
+                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
 
-        // = = = = = =
-        // Read: ADLS
-        // = = = = = =
-        System.out.println(MessageFormat.format("Reading Delta Files From: {0}", Dir_adls));
-        DeltaLog adls_read_log = DeltaLog.forTable(adls_config, Path_adls);
-        printSnapshotDetails("ADLS table", adls_read_log.snapshot());
+        try (var consumer = new KafkaConsumer<String, String>(config)) {
+            consumer.subscribe(Set.of(topic));
 
+            Boolean wrote = false;
+            while (true) {
+                final var records = consumer.poll(Duration.ofMillis(1000));
+                if (records.count() != 0) {
+                    System.out.println("⏩ Got " + records.count() + " record(s)");
+
+                    dataToWrite = ConsumerRecordsToArray(records);
+
+                    // Local Write
+                    System.out.println(MessageFormat.format("💾 Writing Delta To Local: {0}\n", Dir_local));
+                    DeltaLog local_write_log = DeltaLog.forTable(local_config, Path_local);
+                    WriteToDelta(Storage.LOCAL, null, local_write_log, local_config, Path_local,
+                            Dir_local, dataToWrite, KafkaMessage.getClassSchema(), JavaSchema);
+                    
+                    // ADLS Write
+                    System.out.println(MessageFormat.format("⛅ Writing Delta To ADLS: {0}\n", Dir_adls));
+                    DataLakeFileSystemClient adls_fileSystemClient = CreateDirectoryIfNotExists(adls_client,
+                            System.getenv("ADLS_STORAGE_CDC_CONTAINER_NAME"), Dir_adls);
+                    DeltaLog adls_write_log = DeltaLog.forTable(adls_config, Path_adls);
+                    WriteToDelta(Storage.ADLS, adls_fileSystemClient, adls_write_log,
+                            adls_config, Path_adls, Dir_adls, dataToWrite, KafkaMessage.getClassSchema(),
+                            JavaSchema);
+
+                    // Set flag for buffer
+                    wrote = true;
+
+                    // PLACEHOLDER: Read from local and ADLS after commit
+                    System.out.println("💾 Reading back from local");
+                    localRead(local_config, Dir_local);
+                    System.out.println("⛅ Reading back from ADLS");
+                    adlsRead(adls_config, Dir_adls, Path_adls);
+
+                    // Status update
+                    System.out.println("✅ Wrote " + records.count() + " rows to local and ADLS");
+                }
+                // Ack records to broker
+                consumer.commitAsync();
+
+                // Sleep after a write for buffer to fill up
+                if (wrote) {
+                    wrote = false;
+                    System.out.println("⌚ Buffering for: " + buffer_duration + "ms");
+                    Thread.sleep(buffer_duration);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

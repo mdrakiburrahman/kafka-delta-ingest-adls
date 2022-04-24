@@ -1,9 +1,0 @@
-{
-    "type": "record",
-    "namespace": "com.microsoft.kdi",
-    "name": "UserRank",
-    "fields": [
-      { "name": "userId", "type": "int" },
-      { "name": "rank", "type": "int" }
-    ]
-}

@@ -167,11 +167,25 @@
 				1.11.0
 			</version>
 		</dependency>
+		<dependency>
+			<groupId>
+				org.apache.kafka
+			</groupId>
+			<artifactId>
+				kafka-clients
+			</artifactId>
+			<version>
+				2.4.0
+			</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<jdk.version>
 			11
 		</jdk.version>
+		<java.version>
+			11
+		</java.version>
 		<maven.compiler.source>
 			11
 		</maven.compiler.source>
@@ -222,10 +236,10 @@
 				</artifactId>
 				<configuration>
 					<source>
-						1.8
+						11
 					</source>
 					<target>
-						1.8
+						11
 					</target>
 				</configuration>
 			</plugin>
