@@ -68,6 +68,7 @@ Run large number of `INSERTs` in [SQL DB env in this repo](https://github.com/md
 
 - [ ]  Make the buffer logic smart, instead of Sleep - make it poll Kafka to build up the buffer
     - [ ]  This means we can have Data loss as we `ack` messages - so we can’t use the Kafka `offset` anymore. We will need to look at `txn` thing deeper for KDI-rust
+- [ ]  Break of Java classes into KDI, Local, ADLS, etc.
 - [ ]  Make Unit Tests
 - [ ]  Test out Horizontal Scalability/Partition Rebalance etc
 
@@ -76,7 +77,7 @@ Run large number of `INSERTs` in [SQL DB env in this repo](https://github.com/md
 - [ ]  Containerize/Dockerize/Docker-Compose with env
 - [ ]  Kubernetes manifests
 
-“**Enterprise ready”**
+“**Enterprise ready**
 
 - [ ]  A Kubernetes Operator to inject Topic -> Delta Sink info - maybe wrap around a `ReplicaSet` for Horizontal Scalability?
 - [ ]  End-to-end demo with Confluent and Azure Arc SQL MI
