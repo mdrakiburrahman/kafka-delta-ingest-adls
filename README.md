@@ -70,6 +70,8 @@ Run large number of `INSERTs` in [SQL DB env in this repo](https://github.com/md
     - [ ]  This means we can have Data loss as we `ack` messages - so we can’t use the Kafka `offset` anymore. We will need to look at `txn` thing deeper for KDI-rust
 - [ ]  Break of Java classes into KDI, Local, ADLS, etc.
 - [ ]  Make Unit Tests
+- [ ]  Make Date based partition for Delta Writes, rather than Consumer Group name
+   - [ ]  Test with Concurrent Writers
 - [ ]  Test out Horizontal Scalability/Partition Rebalance etc
 
 **Containerize**
@@ -218,3 +220,137 @@ spark.read.format("delta").load(table).show
    - Open `src/test/java/com/microsoft/app/AppTest.java`.
    - Put a breakpoint in a test.
    - Click the `Debug Test` in the Code Lens above the function and watch it hit the breakpoint.
+
+---
+
+# Design notes
+
+**References**
+- [`kafka-delta-ingest` Ref](https://github.com/delta-io/kafka-delta-ingest/blob/main/doc/DESIGN.md)
+- [Delta Transaction Protocol](https://github.com/delta-io/delta/blob/master/PROTOCOL.md#transaction-identifiers)
+
+> Upon startup or partition assignment (in case of rebalance), to identify the last offset written to Delta Lake **for each assigned partition**, the kafka-delta-ingest process must locate the last `txn` action in the delta log for each of its assigned partitions and re-seek the consumer based on the `txn.version` attribute of the delta log.
+
+Here's an example of a Spark Streaming Transaction Log vs `kdi-java`:
+
+**Spark**
+```json
+{
+   "txn":{
+      "appId":"1a660dc3-9a1f-46a7-ad3f-b10e790bfc5f",
+      "version":110,
+      "lastUpdated":1648084804724
+   }
+}{
+   "add":{
+      "path":"part-00000-c62a6323-8049-4ba0-8b7c-1c161199b010-c000.snappy.parquet",
+      "partitionValues":{
+         
+      },
+      "size":121603,
+      "modificationTime":1648084804000,
+      "dataChange":true,
+      "stats":"{\"numRecords\":1000,\"minValues\":{\"offset\":336002,\"timestamp\":\"2022-03-24T01:19:59.698Z\",\"bank\":\"BMO\",\"card_number\":\"372301002597450\",\"card_type\":\"americanexpress\",\"card_use_frequency\":\"Daily\",\"email_address\":\"aalldritt15@stumbleupon.com\",\"first_name\":\"Abran\",\"job_title\":\"Account Coordinator\",\"last_name\":\"Aartsen\",\"origin_state\":\"Alberta\",\"scene_id\":\"0063d519-f5e0-4fcb-9284-02ac539d\",\"trx_amount\":-7.37,\"trx_latitude\":42.103278,\"trx_longitude\":-135.1742264,\"trx_purchase_type\":\"Automotive\",\"trx_timestamp\":\"2016-01-01 17:11:20\"},\"maxValues\":{\"offset\":337001,\"timestamp\":\"2022-03-24T01:19:59.698Z\",\"bank\":\"Tangerine\",\"card_number\":\"5010129823786094\",\"card_type\":\"mastercard\",\"card_use_frequency\":\"Yearly\",\"email_address\":\"zstrotonejh@amazonaws.com\",\"first_name\":\"Zonda\",\"job_title\":\"Web Developer IV\",\"last_name\":\"ducarme\",\"origin_state\":\"Yukon Territory\",\"scene_id\":\"fff9f9f5-0ab5-43ce-9e75-3a583e13�\",\"trx_amount\":581.7,\"trx_latitude\":68.62602,\"trx_longitude\":-52.6912126,\"trx_purchase_type\":\"Toys\",\"trx_timestamp\":\"2024-03-30 18:45:04\"},\"nullCount\":{\"offset\":0,\"timestamp\":0,\"bank\":0,\"card_number\":0,\"card_type\":0,\"card_use_frequency\":0,\"email_address\":0,\"first_name\":0,\"job_title\":0,\"last_name\":0,\"origin_state\":0,\"scene_id\":0,\"trx_amount\":0,\"trx_latitude\":0,\"trx_longitude\":0,\"trx_purchase_type\":0,\"trx_timestamp\":0}}",
+      "tags":{
+         "INSERTION_TIME":"1648084804000000",
+         "OPTIMIZE_TARGET_SIZE":"268435456"
+      }
+   }
+}{
+   "commitInfo":{
+      "timestamp":1648084804725,
+      "userId":"1145870272196957",
+      "userName":"raki.rahman@microsoft.com",
+      "operation":"STREAMING UPDATE",
+      "operationParameters":{
+         "outputMode":"Append",
+         "queryId":"1a660dc3-9a1f-46a7-ad3f-b10e790bfc5f",
+         "epochId":"110"
+      },
+      "notebook":{
+         "notebookId":"1311460039577926"
+      },
+      "clusterId":"0211-140727-9171lf7m",
+      "readVersion":109,
+      "isolationLevel":"WriteSerializable",
+      "isBlindAppend":true,
+      "operationMetrics":{
+         "numRemovedFiles":"0",
+         "numOutputRows":"1000",
+         "numOutputBytes":"121603",
+         "numAddedFiles":"1"
+      }
+   }
+}
+```
+
+**KDI-Java**
+```json
+{
+   "commitInfo":{
+      "timestamp":1650838707621,
+      "operation":"WRITE",
+      "operationParameters":{
+         
+      },
+      "isolationLevel":"Serializable",
+      "isBlindAppend":true,
+      "operationMetrics":{
+         
+      },
+      "engineInfo":"kdi-adls Delta-Standalone/0.4.0"
+   }
+}{
+   "protocol":{
+      "minReaderVersion":1,
+      "minWriterVersion":2
+   }
+}{
+   "metaData":{
+      "id":"50558cb2-7975-44d8-86bd-87418960162d",
+      "format":{
+         "provider":"parquet",
+         "options":{
+            
+         }
+      },
+      "schemaString":"{\"type\":\"struct\",\"fields\":[{\"name\":\"topic\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"key\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"value\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"offset\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}},{\"name\":\"partition\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}},{\"name\":\"timestamp\",\"type\":\"long\",\"nullable\":true,\"metadata\":{}}]}",
+      "partitionColumns":[
+         
+      ],
+      "configuration":{
+         
+      },
+      "createdTime":1650838707424
+   }
+}{
+   "add":{
+      "path":"part-00000-20be1494-7fe9-42b8-baa8-a08205b08379-c000.snappy.parquet",
+      "partitionValues":{
+         
+      },
+      "size":3609,
+      "modificationTime":1650838706000,
+      "dataChange":true
+   }
+}
+```
+
+> Delta files use new-line delimited JSON format, where every action is stored as a single line JSON document. A delta file, `n.json`, contains an atomic set of [actions](https://github.com/delta-io/delta/blob/master/PROTOCOL.md#Actions) that should be applied to the previous table state, `n-1.json`, in order to the construct nth snapshot of the table. An action changes one aspect of the table's state, for example, adding or removing a file.
+
+* So basically, if schema changes, I guess that'll be an action as a new entry.
+
+---
+
+### `txn` **action**
+- [Ref](https://github.com/delta-io/delta/blob/master/PROTOCOL.md#Schema-Serialization-Format)
+
+```json
+"txn":{
+      "appId":"1a660dc3-9a1f-46a7-ad3f-b10e790bfc5f",
+      "version":110,
+      "lastUpdated":1648084804724
+   }
+```
+
+Transaction identifiers are stored in the form of `appId` `version` pairs, where `appId` is a unique identifier for the process that is modifying the table and `version` is an indication of how much progress has been made by that application. The atomic recording of this information along with modifications to the table enables these external system to make their writes into a Delta table idempotent.
