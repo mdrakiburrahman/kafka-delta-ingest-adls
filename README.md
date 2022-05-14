@@ -8,10 +8,54 @@
 **Demo**
 [![Demo](_images/2.png)](https://youtu.be/kvCOlpE4KGs)
 
-## Build and run locally
+---
+## Debezium Setup
+
+To get a working SQL Server + Debezium + Kafdrop setup:
+```bash
+cd /workspaces/kafka-delta-ingest-adls/0.Debezium-setup
+
+export DEBEZIUM_VERSION=1.9
+docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" down
+docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" up -d
+
+# Initiate SQL Server with CDC tables
+cat 1.db-init.sql | docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" exec -T sqlserver bash -c '/opt/mssql-tools/bin/sqlcmd -U sa -P $SA_PASSWORD'
+
+# Turn on Debezium for CDC ingestion
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://connect:8083/connectors/ -d @2.register-sqlserver.json
+
+# Go into SSMS and run demo transactions - 3.demo-inserts.sql
+```
+### Useful links from laptop
+* SQL: localhost,31433
+   * sa:Password!
+* Kafdrop: localhost:19000
+* Kafka:   kafka:9092
+
+---
+## Build and run KDI-Java as seperate Containers
+
+Build Docker image:
+```bash
+cd /workspaces/kafka-delta-ingest-adls/1.KDI-Java
+
+# Login to Dockerhub
+docker login --username=mdrrakiburrahman --password=$DOCKERHUB_TOKEN
+docker build -t mdrrakiburrahman/kdijava .
+docker push mdrrakiburrahman/kdijava
+```
+
+Run Docker image with env variables per tables:
+```bash
+docker-compose -f /workspaces/kafka-delta-ingest-adls/3.Kubernetes/docker-compose-kdi.yaml -p "kdi-clusters" up -d
+```
+---
+
+## Build and run KDI-Java locally as a single VSCode devcontainer
 
 ### Quickstart
-Clean up Delta folders:
+Clean up Delta **folders**:
 ```bash
 # Local
 rm -rf /tmp/delta_standalone_write
@@ -21,75 +65,11 @@ rm -rf /tmp/delta_standalone_write
 
 JAR: `install` and Launch:
 ```bash
+cd /workspaces/kafka-delta-ingest-adls/1.KDI-Java
 clear && mvn clean install && java -jar target/kdi-java-1.0-SNAPSHOT.jar
 ```
 
-Run large number of `INSERTs` in [SQL DB env in this repo](https://github.com/mdrakiburrahman/debezium-sql-linux) to generate CDC logs into Kafka - see [Demo Script](_demo/demo.sql).
-
 ---
-
-### TO-DO
-- [x]  Reads parquet from local
-- [x]  Writes parquet to local
-- [x]  Writes ***delta*** to local
-    - [x]  Read from Spark to ensure Data is good (append only for CDC so F UPSERTs)
-    - [x]  Read back
-    - [x]  Disable Spark dependency for file generation
-
-**ADLS**
-
-- [x]  Read existing Delta table  from ADLS
-- [x]  Writes ***delta*** to **ADLS**
-- [x]  Reads back written delta from ADLS
-
-**Kafka + CDC**
-
-- [x]  Kafka simple consumer app
-- [x]  Kafka Message Schema POJO
-- [x]  Go through Debezium example to see Payload structure as JSON for CRUD
-- [x]  Read with the simple Consumer from EffectiveKafka for now
-
-**Integrate to Delta**
-
-- [x]  Tackle reading a single topic/CDC table - similar to KDI - take as `env` var (scalable)
-- [x]  Write to Delta local/ADLS/whatever in real-time timestamp buffer with 1 parquet
-- [x]  Make the Delta folder semantics `Broker -> Topic -> consumer=...`
-- [x]  Continuous app that keeps track of offsets properly in Kafka if we kill it - i.e. no Data Loss
-
-**Databricks Parse**
-
-- [x]  Quick single notebook to demunge a single table, and the original SQL table
-
-**Documentation**
-
-- [x]  Document/Diagram/Demo
-
-**Perf optimization/Best Practices**
-
-- [ ]  Make the buffer logic smart, instead of Sleep - make it poll Kafka to build up the buffer
-    - [ ]  This means we can have Data loss as we `ack` messages - so we can’t use the Kafka `offset` anymore. We will need to look at `txn` thing deeper for KDI-rust
-- [ ]  Break of Java classes into KDI, Local, ADLS, etc.
-- [ ]  Make Unit Tests
-- [ ]  Make Date based partition for Delta Writes, rather than Consumer Group name
-   - [ ]  Test with Concurrent Writers
-- [ ]  Test out Horizontal Scalability/Partition Rebalance etc
-
-**Containerize**
-
-- [ ]  Containerize/Dockerize/Docker-Compose with env
-- [ ]  Kubernetes manifests
-
-“**Enterprise ready**
-
-- [ ]  A Kubernetes Operator to inject Topic -> Delta Sink info - maybe wrap around a `ReplicaSet` for Horizontal Scalability?
-- [ ]  End-to-end demo with Confluent and Azure Arc SQL MI
-
-**Community?**
-
-- [ ]  Share with to Delta repo?
-
----
-
 ### Other details
 Run locally:
 ```bash
@@ -354,3 +334,68 @@ Here's an example of a Spark Streaming Transaction Log vs `kdi-java`:
 ```
 
 Transaction identifiers are stored in the form of `appId` `version` pairs, where `appId` is a unique identifier for the process that is modifying the table and `version` is an indication of how much progress has been made by that application. The atomic recording of this information along with modifications to the table enables these external system to make their writes into a Delta table idempotent.
+
+---
+<details>
+  <summary>Aspirational TO-DOs</summary>
+  
+   - [x]  Reads parquet from local
+   - [x]  Writes parquet to local
+   - [x]  Writes ***delta*** to local
+      - [x]  Read from Spark to ensure Data is good (append only for CDC so F UPSERTs)
+      - [x]  Read back
+      - [x]  Disable Spark dependency for file generation
+
+   **ADLS**
+
+   - [x]  Read existing Delta table  from ADLS
+   - [x]  Writes ***delta*** to **ADLS**
+   - [x]  Reads back written delta from ADLS
+
+   **Kafka + CDC**
+
+   - [x]  Kafka simple consumer app
+   - [x]  Kafka Message Schema POJO
+   - [x]  Go through Debezium example to see Payload structure as JSON for CRUD
+   - [x]  Read with the simple Consumer from EffectiveKafka for now
+
+   **Integrate to Delta**
+
+   - [x]  Tackle reading a single topic/CDC table - similar to KDI - take as `env` var (scalable)
+   - [x]  Write to Delta local/ADLS/whatever in real-time timestamp buffer with 1 parquet
+   - [x]  Make the Delta folder semantics `Broker -> Topic -> consumer=...`
+   - [x]  Continuous app that keeps track of offsets properly in Kafka if we kill it - i.e. no Data Loss
+
+   **Databricks Parse**
+
+   - [x]  Quick single notebook to demunge a single table, and the original SQL table
+
+   **Documentation**
+
+   - [x]  Document/Diagram/Demo
+
+   **Perf optimization/Best Practices**
+
+   - [ ]  Make the buffer logic smart, instead of Sleep - make it poll Kafka to build up the buffer
+      - [ ]  This means we can have Data loss as we `ack` messages - so we can’t use the Kafka `offset` anymore. We will need to look at `txn` thing deeper for KDI-rust
+   - [ ]  Break of Java classes into KDI, Local, ADLS, etc.
+   - [ ]  Make Unit Tests
+   - [ ]  Make Date based partition for Delta Writes, rather than Consumer Group name
+      - [ ]  Test with Concurrent Writers
+   - [ ]  Test out Horizontal Scalability/Partition Rebalance etc
+
+   **Containerize**
+
+   - [ ]  Containerize/Dockerize/Docker-Compose with env
+   - [ ]  Kubernetes manifests
+
+   “**Enterprise ready**
+
+   - [ ]  A Kubernetes Operator to inject Topic -> Delta Sink info - maybe wrap around a `ReplicaSet` for Horizontal Scalability?
+   - [ ]  End-to-end demo with Confluent and Azure Arc SQL MI
+
+   **Community?**
+
+   - [ ]  Share with to Delta repo?
+</details>
+---

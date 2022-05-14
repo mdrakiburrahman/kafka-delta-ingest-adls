@@ -409,6 +409,7 @@ public final class KDI {
         final var broker = System.getenv("KAFKA_BROKER_ADDRESS");
         final var consumer_self = System.getenv("KAFKA_CONSUMER_NAME_SELF");
         final int buffer_duration = Integer.parseInt(System.getenv("KAFKA_BUFFER"));
+        final boolean write_local = Boolean.parseBoolean(System.getenv("DELTA_WRITE_LOCAL"));
 
         // = = = =
         // Logger
@@ -493,11 +494,16 @@ public final class KDI {
 
                     dataToWrite = ConsumerRecordsToArray(records);
 
-                    // Local Write
-                    System.out.println(MessageFormat.format("💾 Writing Delta To Local: {0}\n", Dir_local));
-                    DeltaLog local_write_log = DeltaLog.forTable(local_config, Path_local);
-                    WriteToDelta(Storage.LOCAL, null, local_write_log, local_config, Path_local,
-                            Dir_local, dataToWrite, KafkaMessage.getClassSchema(), JavaSchema);
+                    // Local Write if environment value is set
+                    if (write_local) {
+                        System.out.println(MessageFormat.format("💾 Writing Delta To Local: {0}\n", Dir_local));
+                        DeltaLog local_write_log = DeltaLog.forTable(local_config, Path_local);
+                        WriteToDelta(Storage.LOCAL, null, local_write_log, local_config, Path_local,
+                                Dir_local, dataToWrite, KafkaMessage.getClassSchema(), JavaSchema);
+                        
+                        System.out.println("💾 Reading back from local");
+                        localRead(local_config, Dir_local);
+                    }
                     
                     // ADLS Write
                     System.out.println(MessageFormat.format("⛅ Writing Delta To ADLS: {0}\n", Dir_adls));
@@ -511,14 +517,12 @@ public final class KDI {
                     // Set flag for buffer
                     wrote = true;
 
-                    // PLACEHOLDER: Read from local and ADLS after commit
-                    System.out.println("💾 Reading back from local");
-                    localRead(local_config, Dir_local);
+                    // PLACEHOLDER: Read from ADLS after commit
                     System.out.println("⛅ Reading back from ADLS");
                     adlsRead(adls_config, Dir_adls, Path_adls);
 
                     // Status update
-                    System.out.println("✅ Wrote " + records.count() + " rows to local and ADLS");
+                    System.out.println("✅ Wrote " + records.count() + " rows as Delta");
                 }
                 // Ack records to broker
                 consumer.commitAsync();
