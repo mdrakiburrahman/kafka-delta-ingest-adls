@@ -16,8 +16,10 @@ To get a working SQL Server + Debezium + Kafdrop setup:
 cd /workspaces/kafka-delta-ingest-adls/0.Debezium-setup
 
 export DEBEZIUM_VERSION=1.9
-docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" down
+# Up
 docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" up -d
+# Down
+docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" down
 
 # Initiate SQL Server with CDC tables
 cat 1.db-init.sql | docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" exec -T sqlserver bash -c '/opt/mssql-tools/bin/sqlcmd -U sa -P $SA_PASSWORD'
@@ -48,7 +50,10 @@ docker push mdrrakiburrahman/kdijava
 
 Run KDI with env variables per table:
 ```bash
+# Up
 docker-compose -f /workspaces/kafka-delta-ingest-adls/3.Kubernetes/docker-compose-kdi.yaml -p "kdi-clusters" up -d
+# Down
+docker-compose -f /workspaces/kafka-delta-ingest-adls/3.Kubernetes/docker-compose-kdi.yaml -p "kdi-clusters" down
 ```
 ---
 
