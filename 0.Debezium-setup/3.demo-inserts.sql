@@ -1,10 +1,10 @@
 USE testDB
 GO
 
--- CDC tables
-SELECT * FROM cdc.change_tables
-SELECT * FROM cdc.dbo_customers_CT
--- Data Tables
+-- = = = = = = = = = = = = =
+-- server1.dbo.customers
+-- = = = = = = = = = = = = =
+-- Read
 SELECT * FROM customers;
 
 -- CREATE
@@ -22,34 +22,60 @@ INSERT INTO customers (first_name, last_name, email) VALUES ('Alidia', 'Abramchi
 -- READ included during first boot
 
 -- UPDATE
-UPDATE customers SET last_name = 'Austin' WHERE first_name = 'Delora';
+UPDATE customers SET last_name = 'Autin' WHERE first_name = 'Delora';
 UPDATE customers SET email = 'zbroadway@cnn.com' WHERE first_name = 'Zahara' AND last_name = 'Broadway';
 
 -- DELETE
 DELETE customers WHERE email = 'aabramchik9@eventbrite.com';
 DELETE customers WHERE email = 'darnout8@eventbrite.com';
 
--- Benchmark INSERTs
-DROP PROCEDURE IF EXISTS dbo.RunInserts
-GO
+-- = = = = = = = = = = = = =
+-- server1.dbo.orders
+-- = = = = = = = = = = = = =
+-- Read
+SELECT * FROM orders;
 
-CREATE PROCEDURE dbo.RunInserts @Number int
-AS
-BEGIN
-	DECLARE
-		@Counter int= 1
-	WHILE @Counter< =@Number
-	BEGIN
-		INSERT INTO customers(first_name,last_name,email)
-		VALUES ('Raki','Rahman', CONCAT(NEWID (), '@microsoft.com'));
-		PRINT(@Counter)
-		SET @Counter= @Counter + 1
-	END
-END
+-- CREATE
+INSERT INTO orders(order_date,purchaser,quantity,product_id) VALUES ('16-JAN-2022', 1005, 5, 103);
 
-EXEC dbo.RunInserts 100 -- <-- Tune as necessary
-SELECT COUNT(*) AS num_rows FROM customers;
+-- READ included during first boot
 
--- Restart Job to show idempotency
-INSERT INTO customers (first_name, last_name, email) VALUES ('Alidia', 'Abramchik', 'aabramchik9@eventbrite.com');
-INSERT INTO customers (first_name, last_name, email) VALUES ('Delcina', 'Arnout', 'darnout8@eventbrite.com');
+-- UPDATE
+UPDATE orders SET order_date = '16-JAN-2029' WHERE purchaser = 1005;
+
+-- DELETE
+DELETE orders WHERE purchaser = 1005;
+
+-- = = = = = = = = = = = = =
+-- server1.dbo.products
+-- = = = = = = = = = = = = =
+-- Read
+SELECT * FROM products;
+
+-- CREATE
+INSERT INTO products(name,description,weight) VALUES ('playstation','PlayStation 5',50);
+
+-- READ included during first boot
+
+-- UPDATE
+UPDATE products SET weight = '69' WHERE name = 'playstation';
+
+-- DELETE
+DELETE products WHERE name = 'playstation';
+
+-- = = = = = = = = = = = = = = = 
+-- server1.dbo.products_on_hand
+-- = = = = = = = = = = = = = = =
+-- Read
+SELECT * FROM products_on_hand;
+
+-- CREATE
+INSERT INTO products_on_hand VALUES (111,69);
+
+-- READ included during first boot
+
+-- UPDATE
+UPDATE products_on_hand SET quantity = 669 WHERE product_id = 111;
+
+-- DELETE
+DELETE products_on_hand WHERE product_id = 111;

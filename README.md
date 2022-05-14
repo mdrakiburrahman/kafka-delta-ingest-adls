@@ -46,7 +46,7 @@ docker build -t mdrrakiburrahman/kdijava .
 docker push mdrrakiburrahman/kdijava
 ```
 
-Run Docker image with env variables per tables:
+Run KDI with env variables per table:
 ```bash
 docker-compose -f /workspaces/kafka-delta-ingest-adls/3.Kubernetes/docker-compose-kdi.yaml -p "kdi-clusters" up -d
 ```
