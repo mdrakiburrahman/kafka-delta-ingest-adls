@@ -30,10 +30,10 @@ curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json"
 # Go into SSMS and run demo transactions - 3.demo-inserts.sql
 ```
 ### Useful links from laptop
-* SQL: localhost,31433
-   * sa:Password!
-* Kafdrop: localhost:19000
-* Kafka:   kafka:9092
+* SQL: `localhost,31433`
+   * `sa:Password!`
+* Kafdrop: `localhost:19000`
+* Kafka:   `kafka:9092`
 
 ---
 ## Build and run KDI-Java as seperate Containers
