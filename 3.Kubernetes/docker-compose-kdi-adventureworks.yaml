@@ -1,0 +1,422 @@
+version: '3.2'
+networks:
+  default:
+    external:
+      name: vnet
+services:
+  kdi-1:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.HumanResources.Employee
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-2:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.HumanResources.EmployeeDepartmentHistory
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-3:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.HumanResources.EmployeePayHistory
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-4:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.HumanResources.JobCandidate
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-5:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.HumanResources.Shift
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-6:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Person.Password
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-7:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Person.Person
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-8:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Person.PersonPhone
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-9:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Person.PhoneNumberType
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-10:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Person.StateProvince
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-11:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Production.TransactionHistory
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-12:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Production.TransactionHistoryArchive
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-13:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Production.UnitMeasure
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-14:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Production.WorkOrder
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-15:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Production.WorkOrderRouting
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-16:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Purchasing.ProductVendor
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-17:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Purchasing.PurchaseOrderDetail
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-18:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Purchasing.PurchaseOrderHeader
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-19:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Purchasing.ShipMethod
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-20:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Purchasing.Vendor
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-21:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Sales.CountryRegionCurrency
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-22:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Sales.CreditCard
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-23:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Sales.Currency
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-24:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Sales.CurrencyRate
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-25:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Sales.Customer
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}
+  kdi-26:
+    image: mdrrakiburrahman/kdijava
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+    environment:
+      KAFKA_TOPIC: AdventureWorks2019.Sales.PersonCreditCard
+      ADLS_STORAGE_ACCOUNT_NAME: ${ADLS_STORAGE_ACCOUNT_NAME}
+      ADLS_STORAGE_CDC_CONTAINER_NAME: ${ADLS_STORAGE_CDC_CONTAINER_NAME}
+      ADLS_CLIENT_ID: ${ADLS_CLIENT_ID}
+      ADLS_CLIENT_SECRET: ${ADLS_CLIENT_SECRET}
+      ADLS_CLIENT_TENANT: ${ADLS_CLIENT_TENANT}
+      KAFKA_BROKER_ADDRESS: ${KAFKA_BROKER_ADDRESS}
+      KAFKA_CONSUMER_NAME_SELF: ${KAFKA_CONSUMER_NAME_SELF}

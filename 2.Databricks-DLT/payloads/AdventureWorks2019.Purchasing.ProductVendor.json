@@ -1,0 +1,318 @@
+{
+  "schema": {
+    "type": "struct",
+    "fields": [
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "ProductID"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "BusinessEntityID"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "AverageLeadTime"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "field": "StandardPrice"
+          },
+          {
+            "type": "bytes",
+            "optional": true,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "field": "LastReceiptCost"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "LastReceiptDate"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "MinOrderQty"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "MaxOrderQty"
+          },
+          {
+            "type": "int32",
+            "optional": true,
+            "field": "OnOrderQty"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "UnitMeasureCode"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "ModifiedDate"
+          }
+        ],
+        "optional": true,
+        "name": "AdventureWorks2019.Purchasing.ProductVendor.Value",
+        "field": "before"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "ProductID"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "BusinessEntityID"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "AverageLeadTime"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "field": "StandardPrice"
+          },
+          {
+            "type": "bytes",
+            "optional": true,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "field": "LastReceiptCost"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "LastReceiptDate"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "MinOrderQty"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "MaxOrderQty"
+          },
+          {
+            "type": "int32",
+            "optional": true,
+            "field": "OnOrderQty"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "UnitMeasureCode"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "ModifiedDate"
+          }
+        ],
+        "optional": true,
+        "name": "AdventureWorks2019.Purchasing.ProductVendor.Value",
+        "field": "after"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "version"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "connector"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "name"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "ts_ms"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "name": "io.debezium.data.Enum",
+            "version": 1,
+            "parameters": {
+              "allowed": "true,last,false,incremental"
+            },
+            "default": "false",
+            "field": "snapshot"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "db"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "sequence"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "schema"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "table"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "change_lsn"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "commit_lsn"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "field": "event_serial_no"
+          }
+        ],
+        "optional": false,
+        "name": "io.debezium.connector.sqlserver.Source",
+        "field": "source"
+      },
+      {
+        "type": "string",
+        "optional": false,
+        "field": "op"
+      },
+      {
+        "type": "int64",
+        "optional": true,
+        "field": "ts_ms"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "id"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "total_order"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "data_collection_order"
+          }
+        ],
+        "optional": true,
+        "field": "transaction"
+      }
+    ],
+    "optional": false,
+    "name": "AdventureWorks2019.Purchasing.ProductVendor.Envelope"
+  },
+  "payload": {
+    "before": {
+      "ProductID": 1,
+      "BusinessEntityID": 1580,
+      "AverageLeadTime": 17,
+      "StandardPrice": "B03s",
+      "LastReceiptCost": "B6tr",
+      "LastReceiptDate": 1314576000000,
+      "MinOrderQty": 1,
+      "MaxOrderQty": 5,
+      "OnOrderQty": 3,
+      "UnitMeasureCode": "CS ",
+      "ModifiedDate": 1314576000000
+    },
+    "after": {
+      "ProductID": 1,
+      "BusinessEntityID": 1580,
+      "AverageLeadTime": 17,
+      "StandardPrice": "B03s",
+      "LastReceiptCost": "B6tr",
+      "LastReceiptDate": 1314576000000,
+      "MinOrderQty": 1,
+      "MaxOrderQty": 5,
+      "OnOrderQty": 3,
+      "UnitMeasureCode": "CS ",
+      "ModifiedDate": 1314576000000
+    },
+    "source": {
+      "version": "1.9.2.Final",
+      "connector": "sqlserver",
+      "name": "AdventureWorks2019",
+      "ts_ms": 1652628159615,
+      "snapshot": "true",
+      "db": "AdventureWorks2019",
+      "sequence": null,
+      "schema": "Purchasing",
+      "table": "ProductVendor",
+      "change_lsn": null,
+      "commit_lsn": "0000002f:00003750:0106",
+      "event_serial_no": null
+    },
+    "op": "r",
+    "ts_ms": 1652628159615,
+    "transaction": null
+  }
+}

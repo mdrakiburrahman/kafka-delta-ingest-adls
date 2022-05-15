@@ -1,0 +1,230 @@
+{
+  "schema": {
+    "type": "struct",
+    "fields": [
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "CreditCardID"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "CardType"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "CardNumber"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "field": "ExpMonth"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "field": "ExpYear"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "ModifiedDate"
+          }
+        ],
+        "optional": true,
+        "name": "AdventureWorks2019.Sales.CreditCard.Value",
+        "field": "before"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "CreditCardID"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "CardType"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "CardNumber"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "field": "ExpMonth"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "field": "ExpYear"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "ModifiedDate"
+          }
+        ],
+        "optional": true,
+        "name": "AdventureWorks2019.Sales.CreditCard.Value",
+        "field": "after"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "version"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "connector"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "name"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "ts_ms"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "name": "io.debezium.data.Enum",
+            "version": 1,
+            "parameters": {
+              "allowed": "true,last,false,incremental"
+            },
+            "default": "false",
+            "field": "snapshot"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "db"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "sequence"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "schema"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "table"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "change_lsn"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "commit_lsn"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "field": "event_serial_no"
+          }
+        ],
+        "optional": false,
+        "name": "io.debezium.connector.sqlserver.Source",
+        "field": "source"
+      },
+      {
+        "type": "string",
+        "optional": false,
+        "field": "op"
+      },
+      {
+        "type": "int64",
+        "optional": true,
+        "field": "ts_ms"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "id"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "total_order"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "data_collection_order"
+          }
+        ],
+        "optional": true,
+        "field": "transaction"
+      }
+    ],
+    "optional": false,
+    "name": "AdventureWorks2019.Sales.CreditCard.Envelope"
+  },
+  "payload": {
+    "before": {
+      "CreditCardID": 1,
+      "CardType": "SuperiorCard",
+      "CardNumber": "33332664695310",
+      "ExpMonth": 11,
+      "ExpYear": 2006,
+      "ModifiedDate": 1375056000000
+    },
+    "after": {
+      "CreditCardID": 1,
+      "CardType": "SuperiorCard",
+      "CardNumber": "33332664695310",
+      "ExpMonth": 11,
+      "ExpYear": 2006,
+      "ModifiedDate": 1375056000000
+    },
+    "source": {
+      "version": "1.9.2.Final",
+      "connector": "sqlserver",
+      "name": "AdventureWorks2019",
+      "ts_ms": 1652628160370,
+      "snapshot": "true",
+      "db": "AdventureWorks2019",
+      "sequence": null,
+      "schema": "Sales",
+      "table": "CreditCard",
+      "change_lsn": null,
+      "commit_lsn": "0000002f:00003750:0106",
+      "event_serial_no": null
+    },
+    "op": "r",
+    "ts_ms": 1652628160370,
+    "transaction": null
+  }
+}

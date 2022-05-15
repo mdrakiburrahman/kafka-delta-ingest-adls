@@ -11,6 +11,7 @@
 ---
 ## Debezium Setup
 
+### Quickstart
 To get a working SQL Server + Debezium + Kafdrop setup:
 ```bash
 cd /workspaces/kafka-delta-ingest-adls/0.Debezium-setup
@@ -22,18 +23,33 @@ docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" up -d
 docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" down
 
 # Initiate SQL Server with CDC tables
-cat 1.db-init.sql | docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" exec -T sqlserver bash -c '/opt/mssql-tools/bin/sqlcmd -U sa -P $SA_PASSWORD'
+cat 1.testDB-init.sql | docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" exec -T sqlserver bash -c '/opt/mssql-tools/bin/sqlcmd -U sa -P $SA_PASSWORD'
 
 # Turn on Debezium for CDC ingestion
-curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://connect:8083/connectors/ -d @2.register-sqlserver.json
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://connect-testDB:8083/connectors/ -d @2.testDB-register.json
 
-# Go into SSMS and run demo transactions - 3.demo-inserts.sql
+# Go into SSMS and run demo transactions - 3.testDB-demo-inserts.sql
 ```
 ### Useful links from laptop
 * SQL: `localhost,31433`
    * `sa:Password!`
 * Kafdrop: `localhost:19000`
 * Kafka:   `kafka:9092`
+
+### `AdventureWorks` restore into existing SQL instance
+
+```bash
+cd /workspaces/kafka-delta-ingest-adls/0.Debezium-setup
+
+# Download AdventureWorks backup
+docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" exec -T sqlserver bash -c 'wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1'
+
+# Setup AdventureWorks and enable CDC
+cat 4.adventureworks-init.sql | docker-compose -f 0.docker-compose-sqlserver.yaml -p "debezium-sandbox" exec -T sqlserver bash -c '/opt/mssql-tools/bin/sqlcmd -U sa -P $SA_PASSWORD'
+
+# Turn on Debezium for CDC ingestion
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://connect-AdventureWorks2019:8083/connectors/ -d @5.adventureworks-register.json
+```
 
 ---
 ## Build and run KDI-Java as seperate Containers
@@ -50,10 +66,21 @@ docker push mdrrakiburrahman/kdijava
 
 Run KDI with env variables per table:
 ```bash
+# - - - - - - - - -
+# testDB
+# - - - - - - - - -
 # Up
-docker-compose -f /workspaces/kafka-delta-ingest-adls/3.Kubernetes/docker-compose-kdi.yaml -p "kdi-clusters" up -d
+docker-compose -f /workspaces/kafka-delta-ingest-adls/3.Kubernetes/docker-compose-kdi-testdb.yaml -p "kdi-clusters-testDB" --compatibility up -d
 # Down
-docker-compose -f /workspaces/kafka-delta-ingest-adls/3.Kubernetes/docker-compose-kdi.yaml -p "kdi-clusters" down
+docker-compose -f /workspaces/kafka-delta-ingest-adls/3.Kubernetes/docker-compose-kdi-testdb.yaml -p "kdi-clusters-testDB" down
+
+# - - - - - - - - -
+# AdventureWorks
+# - - - - - - - - -
+# Up
+docker-compose -f /workspaces/kafka-delta-ingest-adls/3.Kubernetes/docker-compose-kdi-adventureworks.yaml -p "kdi-clusters-adventureworks" --compatibility up -d
+# Down
+docker-compose -f /workspaces/kafka-delta-ingest-adls/3.Kubernetes/docker-compose-kdi-adventureworks.yaml -p "kdi-clusters-adventureworks" down
 ```
 ---
 

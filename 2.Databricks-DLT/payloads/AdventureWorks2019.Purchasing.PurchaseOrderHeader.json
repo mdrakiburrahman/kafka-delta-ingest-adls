@@ -1,0 +1,380 @@
+{
+  "schema": {
+    "type": "struct",
+    "fields": [
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "PurchaseOrderID"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "default": 0,
+            "field": "RevisionNumber"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "default": 1,
+            "field": "Status"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "EmployeeID"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "VendorID"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "ShipMethodID"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "OrderDate"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "ShipDate"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "default": "AA==",
+            "field": "SubTotal"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "default": "AA==",
+            "field": "TaxAmt"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "default": "AA==",
+            "field": "Freight"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "field": "TotalDue"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "ModifiedDate"
+          }
+        ],
+        "optional": true,
+        "name": "AdventureWorks2019.Purchasing.PurchaseOrderHeader.Value",
+        "field": "before"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "PurchaseOrderID"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "default": 0,
+            "field": "RevisionNumber"
+          },
+          {
+            "type": "int16",
+            "optional": false,
+            "default": 1,
+            "field": "Status"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "EmployeeID"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "VendorID"
+          },
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "ShipMethodID"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "OrderDate"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "ShipDate"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "default": "AA==",
+            "field": "SubTotal"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "default": "AA==",
+            "field": "TaxAmt"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "default": "AA==",
+            "field": "Freight"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "field": "TotalDue"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "ModifiedDate"
+          }
+        ],
+        "optional": true,
+        "name": "AdventureWorks2019.Purchasing.PurchaseOrderHeader.Value",
+        "field": "after"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "version"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "connector"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "name"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "ts_ms"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "name": "io.debezium.data.Enum",
+            "version": 1,
+            "parameters": {
+              "allowed": "true,last,false,incremental"
+            },
+            "default": "false",
+            "field": "snapshot"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "db"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "sequence"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "schema"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "table"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "change_lsn"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "commit_lsn"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "field": "event_serial_no"
+          }
+        ],
+        "optional": false,
+        "name": "io.debezium.connector.sqlserver.Source",
+        "field": "source"
+      },
+      {
+        "type": "string",
+        "optional": false,
+        "field": "op"
+      },
+      {
+        "type": "int64",
+        "optional": true,
+        "field": "ts_ms"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "id"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "total_order"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "data_collection_order"
+          }
+        ],
+        "optional": true,
+        "field": "transaction"
+      }
+    ],
+    "optional": false,
+    "name": "AdventureWorks2019.Purchasing.PurchaseOrderHeader.Envelope"
+  },
+  "payload": {
+    "before": {
+      "PurchaseOrderID": 1,
+      "RevisionNumber": 4,
+      "Status": 4,
+      "EmployeeID": 258,
+      "VendorID": 1580,
+      "ShipMethodID": 3,
+      "OrderDate": 1302912000000,
+      "ShipDate": 1303689600000,
+      "SubTotal": "Hq0g",
+      "TaxAmt": "AnRA",
+      "Freight": "AMRU",
+      "TotalDue": "IeW0",
+      "ModifiedDate": 1303689600000
+    },
+    "after": {
+      "PurchaseOrderID": 1,
+      "RevisionNumber": 4,
+      "Status": 4,
+      "EmployeeID": 258,
+      "VendorID": 1580,
+      "ShipMethodID": 3,
+      "OrderDate": 1302912000000,
+      "ShipDate": 1303689600000,
+      "SubTotal": "Hq0g",
+      "TaxAmt": "AnRA",
+      "Freight": "AMRU",
+      "TotalDue": "IeW0",
+      "ModifiedDate": 1303689600000
+    },
+    "source": {
+      "version": "1.9.2.Final",
+      "connector": "sqlserver",
+      "name": "AdventureWorks2019",
+      "ts_ms": 1652628160062,
+      "snapshot": "true",
+      "db": "AdventureWorks2019",
+      "sequence": null,
+      "schema": "Purchasing",
+      "table": "PurchaseOrderHeader",
+      "change_lsn": null,
+      "commit_lsn": "0000002f:00003750:0106",
+      "event_serial_no": null
+    },
+    "op": "r",
+    "ts_ms": 1652628160062,
+    "transaction": null
+  }
+}

@@ -1,0 +1,206 @@
+{
+  "schema": {
+    "type": "struct",
+    "fields": [
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "JobCandidateID"
+          },
+          {
+            "type": "int32",
+            "optional": true,
+            "field": "BusinessEntityID"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "Resume"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "ModifiedDate"
+          }
+        ],
+        "optional": true,
+        "name": "AdventureWorks2019.HumanResources.JobCandidate.Value",
+        "field": "before"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "JobCandidateID"
+          },
+          {
+            "type": "int32",
+            "optional": true,
+            "field": "BusinessEntityID"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "Resume"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "ModifiedDate"
+          }
+        ],
+        "optional": true,
+        "name": "AdventureWorks2019.HumanResources.JobCandidate.Value",
+        "field": "after"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "version"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "connector"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "name"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "ts_ms"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "name": "io.debezium.data.Enum",
+            "version": 1,
+            "parameters": {
+              "allowed": "true,last,false,incremental"
+            },
+            "default": "false",
+            "field": "snapshot"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "db"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "sequence"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "schema"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "table"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "change_lsn"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "commit_lsn"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "field": "event_serial_no"
+          }
+        ],
+        "optional": false,
+        "name": "io.debezium.connector.sqlserver.Source",
+        "field": "source"
+      },
+      {
+        "type": "string",
+        "optional": false,
+        "field": "op"
+      },
+      {
+        "type": "int64",
+        "optional": true,
+        "field": "ts_ms"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "id"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "total_order"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "data_collection_order"
+          }
+        ],
+        "optional": true,
+        "field": "transaction"
+      }
+    ],
+    "optional": false,
+    "name": "AdventureWorks2019.HumanResources.JobCandidate.Envelope"
+  },
+  "payload": {
+    "before": {
+      "JobCandidateID": 1,
+      "BusinessEntityID": null,
+      "Resume": "<ns:Resume xmlns:ns=\"http://schemas.microsoft.com/sqlserver/2004/07/adventure-works/Resume\"><ns:Name><ns:Name.Prefix/><ns:Name.First>Shai</ns:Name.First><ns:Name.Middle/><ns:Name.Last>Bassli</ns:Name.Last><ns:Name.Suffix/></ns:Name><ns:Skills>\nI am an experienced and versatile machinist who can operate a range of machinery personally as well as supervise the work of other machinists. I specialize in diagnostics and precision inspection, have expertise in reading blueprints, and am able to call on strong interpersonal and communication skills to guide the work of other production machinists whose work I am called upon to inspect. \nMy degree in mechanical engineering affords me a better theoretical understanding and mathematical background than many other candidates in the machinist trade.\n    </ns:Skills><ns:Employment><ns:Emp.StartDate>2000-06-01Z</ns:Emp.StartDate><ns:Emp.EndDate>2002-09-30Z</ns:Emp.EndDate><ns:Emp.OrgName>Wingtip Toys</ns:Emp.OrgName><ns:Emp.JobTitle>Lead Machinist</ns:Emp.JobTitle><ns:Emp.Responsibility> Supervised work of staff of four machinists. Coordinated all complex assembly and tooling activities, including production of tricycles and wagons.\nDeveloped parts fabrication from sample parts, drawings and verbal orders.Worked with ISO9000 implementation.\n        </ns:Emp.Responsibility><ns:Emp.FunctionCategory>Production</ns:Emp.FunctionCategory><ns:Emp.IndustryCategory>Manufacturing</ns:Emp.IndustryCategory><ns:Emp.Location><ns:Location><ns:Loc.CountryRegion>US </ns:Loc.CountryRegion><ns:Loc.State>MI </ns:Loc.State><ns:Loc.City>Saginaw</ns:Loc.City></ns:Location></ns:Emp.Location></ns:Employment><ns:Employment><ns:Emp.StartDate>1996-11-15Z</ns:Emp.StartDate><ns:Emp.EndDate>2000-05-01Z</ns:Emp.EndDate><ns:Emp.OrgName>Blue Yonder Airlines</ns:Emp.OrgName><ns:Emp.JobTitle>Machinist</ns:Emp.JobTitle><ns:Emp.Responsibility>Repaired and maintained a variety of production and fabrication machine tools.\nSet up and operated machines to close tolerances. Used and wrote CNC machine programs. Trained extensively in computer-aided manufacturing.\n        </ns:Emp.Responsibility><ns:Emp.FunctionCategory>Production</ns:Emp.FunctionCategory><ns:Emp.IndustryCategory>Manufacturing</ns:Emp.IndustryCategory><ns:Emp.Location><ns:Location><ns:Loc.CountryRegion>US </ns:Loc.CountryRegion><ns:Loc.State>IL </ns:Loc.State><ns:Loc.City>Chicago</ns:Loc.City></ns:Location></ns:Emp.Location></ns:Employment><ns:Employment><ns:Emp.StartDate>1994-06-10Z</ns:Emp.StartDate><ns:Emp.EndDate>1996-07-22Z</ns:Emp.EndDate><ns:Emp.OrgName>City Power and Light</ns:Emp.OrgName><ns:Emp.JobTitle>Assistant Machinist</ns:Emp.JobTitle><ns:Emp.Responsibility>Performed centerless grinding. Received training in manual mill and lathe machines, as well as micrometers and calipers.\nOwned complete toolset.Worked extensive overtime on request. </ns:Emp.Responsibility><ns:Emp.FunctionCategory>Production</ns:Emp.FunctionCategory><ns:Emp.IndustryCategory>Manufacturing</ns:Emp.IndustryCategory><ns:Emp.Location><ns:Location><ns:Loc.CountryRegion>US </ns:Loc.CountryRegion><ns:Loc.State>IA </ns:Loc.State><ns:Loc.City>Des Moines</ns:Loc.City></ns:Location></ns:Emp.Location></ns:Employment><ns:Education><ns:Edu.Level>Bachelor</ns:Edu.Level><ns:Edu.StartDate>1990-09-15Z</ns:Edu.StartDate><ns:Edu.EndDate>1994-05-10Z</ns:Edu.EndDate><ns:Edu.Degree>Bachelor of Science</ns:Edu.Degree><ns:Edu.Major>Mechanical Engineering</ns:Edu.Major><ns:Edu.Minor/><ns:Edu.GPA>3.2</ns:Edu.GPA><ns:Edu.GPAScale>4</ns:Edu.GPAScale><ns:Edu.School>Midwest State University</ns:Edu.School><ns:Edu.Location><ns:Location><ns:Loc.CountryRegion>US </ns:Loc.CountryRegion><ns:Loc.State>IA </ns:Loc.State><ns:Loc.City>Ames</ns:Loc.City></ns:Location></ns:Edu.Location></ns:Education><ns:Address><ns:Addr.Type>Home</ns:Addr.Type><ns:Addr.Street>567 3rd Ave</ns:Addr.Street><ns:Addr.Location><ns:Location><ns:Loc.CountryRegion>US </ns:Loc.CountryRegion><ns:Loc.State>MI </ns:Loc.State><ns:Loc.City>Saginaw</ns:Loc.City></ns:Location></ns:Addr.Location><ns:Addr.PostalCode>53900</ns:Addr.PostalCode><ns:Addr.Telephone><ns:Telephone><ns:Tel.Type>Voice</ns:Tel.Type><ns:Tel.IntlCode>1</ns:Tel.IntlCode><ns:Tel.AreaCode>276</ns:Tel.AreaCode><ns:Tel.Number>555-0114</ns:Tel.Number></ns:Telephone><ns:Telephone><ns:Tel.Type>Fax</ns:Tel.Type><ns:Tel.IntlCode>1</ns:Tel.IntlCode><ns:Tel.AreaCode>276</ns:Tel.AreaCode><ns:Tel.Number>555-0132</ns:Tel.Number></ns:Telephone></ns:Addr.Telephone></ns:Address><ns:EMail>Shai@Example.com</ns:EMail><ns:WebSite/></ns:Resume>",
+      "ModifiedDate": 1182556800000
+    },
+    "after": {
+      "JobCandidateID": 1,
+      "BusinessEntityID": null,
+      "Resume": "<ns:Resume xmlns:ns=\"http://schemas.microsoft.com/sqlserver/2004/07/adventure-works/Resume\"><ns:Name><ns:Name.Prefix/><ns:Name.First>Shai</ns:Name.First><ns:Name.Middle/><ns:Name.Last>Bassli</ns:Name.Last><ns:Name.Suffix/></ns:Name><ns:Skills>\nI am an experienced and versatile machinist who can operate a range of machinery personally as well as supervise the work of other machinists. I specialize in diagnostics and precision inspection, have expertise in reading blueprints, and am able to call on strong interpersonal and communication skills to guide the work of other production machinists whose work I am called upon to inspect. \nMy degree in mechanical engineering affords me a better theoretical understanding and mathematical background than many other candidates in the machinist trade.\n    </ns:Skills><ns:Employment><ns:Emp.StartDate>2000-06-01Z</ns:Emp.StartDate><ns:Emp.EndDate>2002-09-30Z</ns:Emp.EndDate><ns:Emp.OrgName>Wingtip Toys</ns:Emp.OrgName><ns:Emp.JobTitle>Lead Machinist</ns:Emp.JobTitle><ns:Emp.Responsibility> Supervised work of staff of four machinists. Coordinated all complex assembly and tooling activities, including production of tricycles and wagons.\nDeveloped parts fabrication from sample parts, drawings and verbal orders.Worked with ISO9000 implementation.\n        </ns:Emp.Responsibility><ns:Emp.FunctionCategory>Production</ns:Emp.FunctionCategory><ns:Emp.IndustryCategory>Manufacturing</ns:Emp.IndustryCategory><ns:Emp.Location><ns:Location><ns:Loc.CountryRegion>US </ns:Loc.CountryRegion><ns:Loc.State>MI </ns:Loc.State><ns:Loc.City>Saginaw</ns:Loc.City></ns:Location></ns:Emp.Location></ns:Employment><ns:Employment><ns:Emp.StartDate>1996-11-15Z</ns:Emp.StartDate><ns:Emp.EndDate>2000-05-01Z</ns:Emp.EndDate><ns:Emp.OrgName>Blue Yonder Airlines</ns:Emp.OrgName><ns:Emp.JobTitle>Machinist</ns:Emp.JobTitle><ns:Emp.Responsibility>Repaired and maintained a variety of production and fabrication machine tools.\nSet up and operated machines to close tolerances. Used and wrote CNC machine programs. Trained extensively in computer-aided manufacturing.\n        </ns:Emp.Responsibility><ns:Emp.FunctionCategory>Production</ns:Emp.FunctionCategory><ns:Emp.IndustryCategory>Manufacturing</ns:Emp.IndustryCategory><ns:Emp.Location><ns:Location><ns:Loc.CountryRegion>US </ns:Loc.CountryRegion><ns:Loc.State>IL </ns:Loc.State><ns:Loc.City>Chicago</ns:Loc.City></ns:Location></ns:Emp.Location></ns:Employment><ns:Employment><ns:Emp.StartDate>1994-06-10Z</ns:Emp.StartDate><ns:Emp.EndDate>1996-07-22Z</ns:Emp.EndDate><ns:Emp.OrgName>City Power and Light</ns:Emp.OrgName><ns:Emp.JobTitle>Assistant Machinist</ns:Emp.JobTitle><ns:Emp.Responsibility>Performed centerless grinding. Received training in manual mill and lathe machines, as well as micrometers and calipers.\nOwned complete toolset.Worked extensive overtime on request. </ns:Emp.Responsibility><ns:Emp.FunctionCategory>Production</ns:Emp.FunctionCategory><ns:Emp.IndustryCategory>Manufacturing</ns:Emp.IndustryCategory><ns:Emp.Location><ns:Location><ns:Loc.CountryRegion>US </ns:Loc.CountryRegion><ns:Loc.State>IA </ns:Loc.State><ns:Loc.City>Des Moines</ns:Loc.City></ns:Location></ns:Emp.Location></ns:Employment><ns:Education><ns:Edu.Level>Bachelor</ns:Edu.Level><ns:Edu.StartDate>1990-09-15Z</ns:Edu.StartDate><ns:Edu.EndDate>1994-05-10Z</ns:Edu.EndDate><ns:Edu.Degree>Bachelor of Science</ns:Edu.Degree><ns:Edu.Major>Mechanical Engineering</ns:Edu.Major><ns:Edu.Minor/><ns:Edu.GPA>3.2</ns:Edu.GPA><ns:Edu.GPAScale>4</ns:Edu.GPAScale><ns:Edu.School>Midwest State University</ns:Edu.School><ns:Edu.Location><ns:Location><ns:Loc.CountryRegion>US </ns:Loc.CountryRegion><ns:Loc.State>IA </ns:Loc.State><ns:Loc.City>Ames</ns:Loc.City></ns:Location></ns:Edu.Location></ns:Education><ns:Address><ns:Addr.Type>Home</ns:Addr.Type><ns:Addr.Street>567 3rd Ave</ns:Addr.Street><ns:Addr.Location><ns:Location><ns:Loc.CountryRegion>US </ns:Loc.CountryRegion><ns:Loc.State>MI </ns:Loc.State><ns:Loc.City>Saginaw</ns:Loc.City></ns:Location></ns:Addr.Location><ns:Addr.PostalCode>53900</ns:Addr.PostalCode><ns:Addr.Telephone><ns:Telephone><ns:Tel.Type>Voice</ns:Tel.Type><ns:Tel.IntlCode>1</ns:Tel.IntlCode><ns:Tel.AreaCode>276</ns:Tel.AreaCode><ns:Tel.Number>555-0114</ns:Tel.Number></ns:Telephone><ns:Telephone><ns:Tel.Type>Fax</ns:Tel.Type><ns:Tel.IntlCode>1</ns:Tel.IntlCode><ns:Tel.AreaCode>276</ns:Tel.AreaCode><ns:Tel.Number>555-0132</ns:Tel.Number></ns:Telephone></ns:Addr.Telephone></ns:Address><ns:EMail>Shai@Example.com</ns:EMail><ns:WebSite/></ns:Resume>",
+      "ModifiedDate": 1182556800000
+    },
+    "source": {
+      "version": "1.9.2.Final",
+      "connector": "sqlserver",
+      "name": "AdventureWorks2019",
+      "ts_ms": 1652628137996,
+      "snapshot": "true",
+      "db": "AdventureWorks2019",
+      "sequence": null,
+      "schema": "HumanResources",
+      "table": "JobCandidate",
+      "change_lsn": null,
+      "commit_lsn": "0000002f:00003750:0106",
+      "event_serial_no": null
+    },
+    "op": "r",
+    "ts_ms": 1652628137996,
+    "transaction": null
+  }
+}

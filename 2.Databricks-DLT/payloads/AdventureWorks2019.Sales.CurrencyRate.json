@@ -1,0 +1,270 @@
+{
+  "schema": {
+    "type": "struct",
+    "fields": [
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "CurrencyRateID"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "CurrencyRateDate"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "FromCurrencyCode"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "ToCurrencyCode"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "field": "AverageRate"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "field": "EndOfDayRate"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "ModifiedDate"
+          }
+        ],
+        "optional": true,
+        "name": "AdventureWorks2019.Sales.CurrencyRate.Value",
+        "field": "before"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "int32",
+            "optional": false,
+            "field": "CurrencyRateID"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "CurrencyRateDate"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "FromCurrencyCode"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "ToCurrencyCode"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "field": "AverageRate"
+          },
+          {
+            "type": "bytes",
+            "optional": false,
+            "name": "org.apache.kafka.connect.data.Decimal",
+            "version": 1,
+            "parameters": {
+              "scale": "4",
+              "connect.decimal.precision": "19"
+            },
+            "field": "EndOfDayRate"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "name": "io.debezium.time.Timestamp",
+            "version": 1,
+            "field": "ModifiedDate"
+          }
+        ],
+        "optional": true,
+        "name": "AdventureWorks2019.Sales.CurrencyRate.Value",
+        "field": "after"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "version"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "connector"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "name"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "ts_ms"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "name": "io.debezium.data.Enum",
+            "version": 1,
+            "parameters": {
+              "allowed": "true,last,false,incremental"
+            },
+            "default": "false",
+            "field": "snapshot"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "db"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "sequence"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "schema"
+          },
+          {
+            "type": "string",
+            "optional": false,
+            "field": "table"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "change_lsn"
+          },
+          {
+            "type": "string",
+            "optional": true,
+            "field": "commit_lsn"
+          },
+          {
+            "type": "int64",
+            "optional": true,
+            "field": "event_serial_no"
+          }
+        ],
+        "optional": false,
+        "name": "io.debezium.connector.sqlserver.Source",
+        "field": "source"
+      },
+      {
+        "type": "string",
+        "optional": false,
+        "field": "op"
+      },
+      {
+        "type": "int64",
+        "optional": true,
+        "field": "ts_ms"
+      },
+      {
+        "type": "struct",
+        "fields": [
+          {
+            "type": "string",
+            "optional": false,
+            "field": "id"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "total_order"
+          },
+          {
+            "type": "int64",
+            "optional": false,
+            "field": "data_collection_order"
+          }
+        ],
+        "optional": true,
+        "field": "transaction"
+      }
+    ],
+    "optional": false,
+    "name": "AdventureWorks2019.Sales.CurrencyRate.Envelope"
+  },
+  "payload": {
+    "before": {
+      "CurrencyRateID": 1,
+      "CurrencyRateDate": 1306800000000,
+      "FromCurrencyCode": "USD",
+      "ToCurrencyCode": "ARS",
+      "AverageRate": "JxA=",
+      "EndOfDayRate": "JxI=",
+      "ModifiedDate": 1306800000000
+    },
+    "after": {
+      "CurrencyRateID": 1,
+      "CurrencyRateDate": 1306800000000,
+      "FromCurrencyCode": "USD",
+      "ToCurrencyCode": "ARS",
+      "AverageRate": "JxA=",
+      "EndOfDayRate": "JxI=",
+      "ModifiedDate": 1306800000000
+    },
+    "source": {
+      "version": "1.9.2.Final",
+      "connector": "sqlserver",
+      "name": "AdventureWorks2019",
+      "ts_ms": 1652628161200,
+      "snapshot": "true",
+      "db": "AdventureWorks2019",
+      "sequence": null,
+      "schema": "Sales",
+      "table": "CurrencyRate",
+      "change_lsn": null,
+      "commit_lsn": "0000002f:00003750:0106",
+      "event_serial_no": null
+    },
+    "op": "r",
+    "ts_ms": 1652628161200,
+    "transaction": null
+  }
+}
