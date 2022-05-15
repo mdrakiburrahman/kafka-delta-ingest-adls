@@ -9,10 +9,96 @@
 [![Demo](_images/2.png)](https://youtu.be/kvCOlpE4KGs)
 
 ---
+# Kubernetes
+
+<details>
+  <summary>Microk8s Cluster setup</summary>
+
+  Open PowerShell as **admin**:****
+   ```PowerShell
+   # Delete old one (if any)
+   multipass list
+   multipass delete microk8s-vm
+   multipass purge
+
+   # Single node K8s cluster
+   # Latest releases: https://microk8s.io/docs/release-notes
+   microk8s install "--cpu=10" "--mem=32" "--disk=50" "--channel=1.22/stable" -y
+
+   # Seems to work better for smaller VMs (when my PSU was bad :-) )
+
+   # Launched: microk8s-vm
+   # 2022-03-05T23:05:51Z INFO Waiting for automatic snapd restart...
+   # ...
+
+   # Stop the VM
+   microk8s stop
+
+   # Turn off Dynamic Memory
+   Set-VMMemory -VMName 'microk8s-vm' -DynamicMemoryEnabled $false -Priority 100
+   
+   microk8s start
+
+   # Allow priveleged containers
+   multipass shell microk8s-vm
+
+   sudo bash -c 'echo "--allow-privileged" >> /var/snap/microk8s/current/args/kube-apiserver'
+
+   exit # Exit out from Microk8s vm
+
+   # Start microk8s
+   microk8s status --wait-ready
+
+   # Get IP address of node for MetalLB range
+   microk8s kubectl get nodes -o wide -o json | jq -r '.items[].status.addresses[]'
+   # {
+   #   "address": "172.18.156.92",
+   #   "type": "InternalIP"
+   # }
+   # {
+   #   "address": "microk8s-vm",
+   #   "type": "Hostname"
+   # }
+
+   # Enable features needed for arc
+   microk8s enable dns storage metallb ingress dashboard # rbac # dashboard <> rbac - both causes issues, one is ok
+   # Enter CIDR for MetalLB: 
+
+   # 172.18.156.100-172.18.156.120
+
+   # This must be in the same range as the VM above!
+
+   # Access via kubectl in this container
+   $DIR = "C:\Users\mdrrahman\Documents\GitHub\kafka-delta-ingest-adls\4.Kubernetes"
+   microk8s config view > $DIR\config # Export kubeconfig
+
+   # Access Dashboard via proxy
+   microk8s dashboard-proxy
+   ```
+
+   Now run in `bash` in this container:
+   ```bash
+   rm -rf $HOME/.kube
+   mkdir $HOME/.kube
+   cp /workspaces/kafka-delta-ingest-adls/4.Kubernetes/config $HOME/.kube/config
+   dos2unix $HOME/.kube/config
+   cat $HOME/.kube/config
+
+   # Check kubectl works
+   kubectl get nodes
+   # NAME          STATUS   ROLES    AGE   VERSION
+   # microk8s-vm   Ready    <none>   29m   v1.22.6-3+7ab10db7034594
+   ```
+</details>
+
+---
+# Docker Desktop
+
 ## Debezium Setup
 
 ### Quickstart
 To get a working SQL Server + Debezium + Kafdrop setup:
+
 ```bash
 cd /workspaces/kafka-delta-ingest-adls/0.Debezium-setup
 

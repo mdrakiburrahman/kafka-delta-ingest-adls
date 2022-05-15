@@ -343,3 +343,6 @@ dependency-reduced-pom.xml
 .dependency-reduced-pom.xml
 .project
 tmp/*
+
+# Kubeconfig
+*/config

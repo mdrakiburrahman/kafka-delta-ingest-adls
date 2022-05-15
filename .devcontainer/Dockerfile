@@ -21,23 +21,13 @@ RUN if [ "${NODE_VERSION}" != "none" ]; then su vscode -c "umask 0002 && . /usr/
 # = = = = = = = = = = = = = = = = = = = = = = = =
 RUN apt-get update && apt-get upgrade -y && \
     apt-get -y install mlocate && \
-    apt-get install tree -y
+    apt-get install tree -y && \
+    apt-get install make -y && \
+    apt-get install dos2unix -y
 
-# Install Apache Spark
-RUN wget https://dlcdn.apache.org/spark/spark-3.1.2/spark-3.1.2-bin-hadoop3.2.tgz && \
-    tar -xvf spark-3.1.2-bin-hadoop3.2.tgz && \
-    mkdir /opt/spark && \
-    mv spark-3.1.2-bin-hadoop3.2/* /opt/spark && \
-    rm spark-3.1.2-bin-hadoop3.2.tgz && \
-    rm -rf spark-3.1.2-bin-hadoop3.2
-
-# Install Apache Kafka 2.4.0
-RUN wget https://archive.apache.org/dist/kafka/2.4.0/kafka_2.13-2.4.0.tgz && \
-    tar -xvf kafka_2.13-2.4.0.tgz && \
-    mkdir /opt/kafka && \
-    mv kafka_2.13-2.4.0/* /opt/kafka && \
-    rm kafka_2.13-2.4.0.tgz && \
-    rm -rf kafka_2.13-2.4.0
+# = = = = = = = = = = = = = = = = = = = = = = = =
+# Docker
+# = = = = = = = = = = = = = = = = = = = = = = = =
 
 # Docker Compose version
 ARG COMPOSE_VERSION=1.24.0
@@ -52,3 +42,38 @@ RUN apt-get install -y apt-transport-https ca-certificates curl gnupg-agent soft
 # Install Docker Compose
 RUN curl -sSL "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
     && chmod +x /usr/local/bin/docker-compose
+
+# = = = = = = = = = = = = = = = = = = = = = = = =
+# Kubernetes
+# = = = = = = = = = = = = = = = = = = = = = = = =
+# Helm Version
+ARG HELM_VERSION=3.6.3
+
+# Install Kubectl
+RUN echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list \
+    && curl -sL https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - 2>/dev/null \
+    && apt-get update \
+    && apt-get install -y kubectl
+
+# Install Helm
+RUN mkdir -p /tmp/downloads/helm \
+    && curl -sL -o /tmp/downloads/helm.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz \
+    && tar -C /tmp/downloads/helm -zxvf /tmp/downloads/helm.tar.gz \
+    && mv /tmp/downloads/helm/linux-amd64/helm /usr/local/bin
+
+# Make kubectl completions work with 'k' alias
+RUN echo 'alias k=kubectl' >> "/root/.zshrc" \
+    && echo 'complete -F __start_kubectl k' >> "/root/.zshrc" \
+    && echo "[[ $commands[kubectl] ]] && source <(kubectl completion zsh)" >> "/root/.zshrc"
+
+RUN echo 'alias k=kubectl' >> "/root/.bashrc" \
+    && echo 'complete -F __start_kubectl k' >> "/root/.bashrc" \
+    && echo "[[ $commands[kubectl] ]] && source <(kubectl completion zsh)" >> "/root/.bashrc"
+
+# Install kubectx
+ENV VERSION "0.9.4"
+RUN echo "Installing kubectx" \
+    && curl -L -o /usr/local/bin/kubectx https://raw.githubusercontent.com/ahmetb/kubectx/v${VERSION}/kubectx \
+	&& curl -L -o /usr/local/bin/kubens https://raw.githubusercontent.com/ahmetb/kubectx/v${VERSION}/kubens \
+    && chmod +x /usr/local/bin/kubectx \
+    && chmod +x /usr/local/bin/kubens

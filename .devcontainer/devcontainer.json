@@ -12,7 +12,7 @@
 		"--security-opt",
 		"seccomp=unconfined",
 		"--env-file=.devcontainer/devcontainer.env",
-		"--network=vnet"
+		// "--network=vnet" // Comment out for Microk8s, uncomment for Docker
 	],
 	"build": {
 		"dockerfile": "Dockerfile",
@@ -45,7 +45,9 @@
 		"github.copilot",
 		// VSCode stuff
 		"esbenp.prettier-vscode",
-		"fabianlauer.vs-code-xml-format"
+		"fabianlauer.vs-code-xml-format",
+		// Kubernetes stuff
+		"ms-kubernetes-tools.vscode-kubernetes-tools"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
