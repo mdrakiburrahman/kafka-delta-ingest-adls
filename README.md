@@ -91,6 +91,111 @@
    ```
 </details>
 
+```bash
+# - - - - - - - - -
+# Debezium setup
+# - - - - - - - - -
+# Create debezium namespace
+kubectl create ns debezium
+
+# Apply Debezium sandbox
+kubectl apply -f /workspaces/kafka-delta-ingest-adls/4.Kubernetes/debezium-sandbox.yaml
+
+# Grab IPs from kubectl or K8s Dashboard
+export debezium_testdb_ip=$(kubectl get svc connect-testdb -n debezium -o=json | jq -r .status.loadBalancer.ingress[0].ip)
+export debezium_adventureworks_ip=$(kubectl get svc connect-adventureworks2019 -n debezium -o=json | jq -r .status.loadBalancer.ingress[0].ip)
+
+echo $debezium_testdb_ip
+echo $debezium_adventureworks_ip
+
+# - - - - 
+# testDB
+# - - - -
+# Initiate table
+cd /workspaces/kafka-delta-ingest-adls/0.Debezium-setup
+cat 1.testDB-init.sql | kubectl exec -it sqlserver -n debezium -- bash -c '/opt/mssql-tools/bin/sqlcmd -U sa -P $SA_PASSWORD'
+
+# Turn on Debezium
+cd /workspaces/kafka-delta-ingest-adls/4.Kubernetes
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://$debezium_testdb_ip:8083/connectors/ -d @testDB-register.json
+
+# - - - - - - - - - 
+# AdventureWorks
+# - - - - - - - - - 
+# Download AdventureWorks backup
+kubectl exec -it sqlserver -n debezium -- bash -c 'wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1'
+
+# Setup AdventureWorks and enable CDC
+cd /workspaces/kafka-delta-ingest-adls/0.Debezium-setup
+cat 4.adventureworks-init.sql | kubectl exec -it sqlserver -n debezium -- bash -c '/opt/mssql-tools/bin/sqlcmd -U sa -P $SA_PASSWORD'
+
+# Turn on Debezium
+cd /workspaces/kafka-delta-ingest-adls/4.Kubernetes
+curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://$debezium_adventureworks_ip:8083/connectors/ -d @adventureworks-register.json
+
+# - - - - - - - - -
+# KDI setup
+# - - - - - - - - -
+# Create kdi namespace
+kubectl create ns kdi
+
+# - - - - - - - - - - - - - -
+# testDB + AdventureWorks2019
+# - - - - - - - - - - - - - - 
+topics=("testDB.dbo.customers" "testDB.dbo.orders" "testDB.dbo.products" "testDB.dbo.products_on_hand" "AdventureWorks2019.HumanResources.Employee" "AdventureWorks2019.HumanResources.EmployeeDepartmentHistory" "AdventureWorks2019.HumanResources.EmployeePayHistory" "AdventureWorks2019.HumanResources.JobCandidate" "AdventureWorks2019.HumanResources.Shift" "AdventureWorks2019.Person.Password" "AdventureWorks2019.Person.Person" "AdventureWorks2019.Person.PersonPhone" "AdventureWorks2019.Person.PhoneNumberType" "AdventureWorks2019.Person.StateProvince" "AdventureWorks2019.Production.TransactionHistory" "AdventureWorks2019.Production.TransactionHistoryArchive" "AdventureWorks2019.Production.UnitMeasure" "AdventureWorks2019.Production.WorkOrder" "AdventureWorks2019.Production.WorkOrderRouting" "AdventureWorks2019.Purchasing.ProductVendor" "AdventureWorks2019.Purchasing.PurchaseOrderDetail" "AdventureWorks2019.Purchasing.PurchaseOrderHeader" "AdventureWorks2019.Purchasing.ShipMethod" "AdventureWorks2019.Purchasing.Vendor" "AdventureWorks2019.Sales.CountryRegionCurrency" "AdventureWorks2019.Sales.CreditCard" "AdventureWorks2019.Sales.Currency" "AdventureWorks2019.Sales.CurrencyRate" "AdventureWorks2019.Sales.Customer" "AdventureWorks2019.Sales.PersonCreditCard")
+
+for i in ${!topics[@]}; do
+ array=($(echo ${topics[$i]} | tr "." "\n"))
+ name=($(echo ${array[2]} | tr _ - | tr '[:upper:]' '[:lower:]'))
+ cat <<EOF | kubectl apply -f -
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: 'kdi-${name}'
+  namespace: kdi
+spec:
+  selector:
+    matchLabels:
+      app: 'kdi-${name}'
+  template:
+    metadata:
+      labels:
+        app: 'kdi-${name}'
+    spec:
+      containers:
+        - name: kdi
+          image: mdrrakiburrahman/kdijava
+          resources:
+            limits:
+              memory: 384M
+              cpu: '0.25'
+          env:
+            - name: KAFKA_TOPIC
+              value: '${topics[$i]}'
+            - name: ADLS_STORAGE_ACCOUNT_NAME
+              value: '${ADLS_STORAGE_ACCOUNT_NAME}'
+            - name: ADLS_STORAGE_CDC_CONTAINER_NAME
+              value: '${ADLS_STORAGE_CDC_CONTAINER_NAME}'
+            - name: ADLS_CLIENT_ID
+              value: '${ADLS_CLIENT_ID}'
+            - name: ADLS_CLIENT_SECRET
+              value: '${ADLS_CLIENT_SECRET}'
+            - name: ADLS_CLIENT_TENANT
+              value: '${ADLS_CLIENT_TENANT}'
+            - name: KAFKA_BROKER_ADDRESS
+              value: 'kafka-service.debezium.svc.cluster.local:9092'
+            - name: KAFKA_CONSUMER_NAME_SELF
+              value: '${KAFKA_CONSUMER_NAME_SELF}'
+            - name: KAFKA_BUFFER
+              value: '0'
+EOF
+ x=$(( $x + 1 ))
+done
+```
+
+And now we should see data flowing in:
+`#TODO`
+
 ---
 # Docker Desktop
 

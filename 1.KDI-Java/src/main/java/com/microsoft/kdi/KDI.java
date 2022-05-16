@@ -518,8 +518,8 @@ public final class KDI {
                     wrote = true;
 
                     // PLACEHOLDER: Read from ADLS after commit
-                    System.out.println("⛅ Reading back from ADLS");
-                    adlsRead(adls_config, Dir_adls, Path_adls);
+                    // System.out.println("⛅ Reading back from ADLS");
+                    // adlsRead(adls_config, Dir_adls, Path_adls);
 
                     // Status update
                     System.out.println("✅ Wrote " + records.count() + " rows as Delta");

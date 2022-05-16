@@ -22,7 +22,7 @@ INSERT INTO customers (first_name, last_name, email) VALUES ('Alidia', 'Abramchi
 -- READ included during first boot
 
 -- UPDATE
-UPDATE customers SET last_name = 'Autin' WHERE first_name = 'Delora';
+UPDATE customers SET last_name = 'Austin' WHERE first_name = 'Delora';
 UPDATE customers SET email = 'zbroadway@cnn.com' WHERE first_name = 'Zahara' AND last_name = 'Broadway';
 
 -- DELETE
@@ -70,12 +70,12 @@ DELETE products WHERE name = 'playstation';
 SELECT * FROM products_on_hand;
 
 -- CREATE
-INSERT INTO products_on_hand VALUES (111,69);
+INSERT INTO products_on_hand VALUES (110,69);
 
 -- READ included during first boot
 
 -- UPDATE
-UPDATE products_on_hand SET quantity = 669 WHERE product_id = 111;
+UPDATE products_on_hand SET quantity = 669 WHERE product_id = 110;
 
 -- DELETE
 DELETE products_on_hand WHERE product_id = 111;

@@ -1,0 +1,268 @@
+# = = = = = = =
+# Kafka
+# - - - - - - -
+# Deployments
+# - - - - - - -
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: zookeeper
+  namespace: debezium
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: quay.io/debezium/zookeeper:1.9
+          ports:
+            - containerPort: 2181
+            - containerPort: 2888
+            - containerPort: 3888
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: kafka
+  namespace: debezium
+spec:
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+        id: "0"
+    spec:
+      containers:
+        - name: kafka
+          image: quay.io/debezium/kafka:1.9
+          ports:
+            - containerPort: 9092
+          env:
+            # https://github.com/debezium/docker-images/blob/main/connect-base/0.3/README.md#environment-variables
+            - name: ZOOKEEPER_CONNECT
+              value: zookeeper:2181
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: kafdrop-1
+  namespace: debezium
+spec:
+  selector:
+    matchLabels:
+      app: kafdrop
+  template:
+    metadata:
+      labels:
+        app: kafdrop
+    spec:
+      containers:
+        - name: kafdrop
+          image: obsidiandynamics/kafdrop:latest
+          ports:
+            - containerPort: 9000
+          env:
+            - name: KAFKA_BROKERCONNECT
+              value: "kafka-service:9092"
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: connect-testdb
+  namespace: debezium
+spec:
+  selector:
+    matchLabels:
+      app: connect-testdb
+  template:
+    metadata:
+      labels:
+        app: connect-testdb
+    spec:
+      containers:
+        - name: connect
+          image: quay.io/debezium/connect:1.9
+          ports:
+            - containerPort: 8083
+          env:
+            - name: BOOTSTRAP_SERVERS
+              value: "kafka-service:9092"
+            - name: GROUP_ID
+              value: '1'
+            - name: CONFIG_STORAGE_TOPIC
+              value: my_connect_configs
+            - name: OFFSET_STORAGE_TOPIC
+              value: my_connect_offsets
+            - name: STATUS_STORAGE_TOPIC
+              value: my_connect_statuses
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: connect-adventureworks2019
+  namespace: debezium
+spec:
+  selector:
+    matchLabels:
+      app: connect-adventureworks2019
+  template:
+    metadata:
+      labels:
+        app: connect-adventureworks2019
+    spec:
+      containers:
+        - name: connect
+          image: quay.io/debezium/connect:1.9
+          ports:
+            - containerPort: 8083
+          env:
+            - name: BOOTSTRAP_SERVERS
+              value: "kafka-service:9092"
+            - name: GROUP_ID
+              value: '1'
+            - name: CONFIG_STORAGE_TOPIC
+              value: my_connect_configs
+            - name: OFFSET_STORAGE_TOPIC
+              value: my_connect_offsets
+            - name: STATUS_STORAGE_TOPIC
+              value: my_connect_statuses
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sqlserver
+  namespace: debezium
+  labels:
+    app: sqlserver
+spec:
+  containers:
+  - name: mssql
+    image: 'mcr.microsoft.com/mssql/server:2019-latest'
+    env:
+    - name: MSSQL_PID
+      value: "Standard"
+    - name: ACCEPT_EULA
+      value: "Y"
+    - name: SA_PASSWORD
+      value: "acntorPRESTO!"
+    - name: MSSQL_AGENT_ENABLED
+      value: "true"
+    ports:
+    - containerPort: 1433
+      protocol: TCP
+---
+
+# - - - - - - -
+# Services
+# - - - - - - -
+apiVersion: v1
+kind: Service
+metadata:
+  name: sqlserver
+  namespace: debezium
+  labels:
+    app: sqlserver
+spec:
+  type: LoadBalancer
+  ports:
+    - name: tds
+      port: 1433
+      protocol: TCP
+  selector:
+    app: sqlserver
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: connect-testdb
+  namespace: debezium
+  labels:
+    app: connect-testdb
+spec:
+  type: LoadBalancer
+  ports:
+    - name: api
+      port: 8083
+      protocol: TCP
+  selector:
+    app: connect-testdb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: connect-adventureworks2019
+  namespace: debezium
+  labels:
+    app: connect-adventureworks2019
+spec:
+  type: LoadBalancer
+  ports:
+    - name: api
+      port: 8083
+      protocol: TCP
+  selector:
+    app: connect-adventureworks2019
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafdrop-ui
+  namespace: debezium
+  labels:
+    app: kafdrop
+spec:
+  type: LoadBalancer
+  ports:
+    - name: ui
+      port: 9000
+      protocol: TCP
+  selector:
+    app: kafdrop
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+  namespace: debezium
+  labels:
+    app: zookeeper
+spec:
+  ports:
+    - name: client
+      port: 2181
+      protocol: TCP
+    - name: follower
+      port: 2888
+      protocol: TCP
+    - name: leader
+      port: 3888
+      protocol: TCP
+  selector:
+    app: zookeeper
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-service
+  namespace: debezium
+  labels:
+    name: kafka
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+    - port: 9092
+      targetPort: 9092
+      name: kafka-port
+      protocol: TCP
+  selector:
+    app: kafka
+    id: "0"
