@@ -12,7 +12,7 @@
 		"--security-opt",
 		"seccomp=unconfined",
 		"--env-file=.devcontainer/devcontainer.env",
-		// "--network=vnet" // Comment out for Microk8s, uncomment for Docker
+		"--network=vnet" // Comment out for Microk8s, uncomment for Docker
 	],
 	"build": {
 		"dockerfile": "Dockerfile",
